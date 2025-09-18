@@ -1,0 +1,22 @@
+{
+  "name": "os-pbl",
+  "version": "1.0.0",
+  "description": "OS PBL 5TH SEM THREAD-EYE",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HYDRABLOOMER/ThreadEye.git"
+  },
+  "author": "Aditya Thapliyal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HYDRABLOOMER/ThreadEye/issues"
+  },
+  "homepage": "https://github.com/HYDRABLOOMER/ThreadEye#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
