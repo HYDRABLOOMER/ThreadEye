@@ -90,7 +90,7 @@ h1 {
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    color: #fff;
+    color: transparent;
     font-size: 1.2em;
 }
 
