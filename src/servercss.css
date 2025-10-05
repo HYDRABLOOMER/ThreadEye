@@ -1,0 +1,208 @@
+/* --- 1. Global Reset & Typography --- */
+body {
+    font-family: 'Roboto Mono', sans-serif; /* For data readouts and technical feel */
+    background-color: #1a1a2e; /* Deep dark blue/purple background */
+    color: #e0e0e0; /* Light text */
+    margin: 0;
+    padding: 0;
+}
+
+.logo {
+    font-family: 'Fira Code', monospace;
+    color: #4CAF50; /* Green accent for the title */
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #333;
+    margin: 0;
+}
+
+/* Data Color Palette */
+.data-primary { color: #00bcd4; } /* Teal/Electric Blue for success/primary data */
+.data-active { color: #4CAF50; } /* Green for active/online */
+.data-warning { color: #ff9800; } /* Orange for warnings */
+.data-critical { color: #f44336; } /* Red for critical/alerts */
+.unit { font-size: 0.8em; opacity: 0.7; }
+
+/* --- 2. Dashboard Layout (CSS Grid) --- */
+.dashboard-container {
+    display: grid;
+    /* Define 3 columns: Left (fixed narrow), Main (flexible wide), Right (fixed narrow) */
+    grid-template-columns: 280px 1fr 320px;
+    height: 100vh;
+    overflow: hidden; /* Prevent body scroll, widgets will scroll internally */
+}
+
+.dashboard-sidebar {
+    background-color: #24243e; /* Slightly lighter dark for contrast */
+    padding: 20px;
+    overflow-y: auto; /* Allow scrolling for sidebar content */
+    border-right: 1px solid #333;
+}
+
+.right-sidebar {
+    border-right: none;
+    border-left: 1px solid #333;
+}
+
+.dashboard-main {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* --- 3. Widget Styling --- */
+.widget {
+    background-color: #2b2b4d; /* Card background */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.widget h2 {
+    font-size: 1.1em;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+/* Big data text style */
+.big-data {
+    font-size: 2.5em;
+    font-weight: 600;
+    margin: 0;
+}
+.sub-data { font-size: 0.9em; opacity: 0.8; }
+
+/* --- 4. Main Content Grid --- */
+.metrics-grid {
+    display: grid;
+    /* 2 equal columns within the main body */
+    grid-template-columns: 2fr 1fr; 
+    gap: 20px;
+}
+/* Ensure the first widget (throughput) spans both columns */
+.metrics-grid > .wide-widget:nth-child(1) {
+    grid-column: 1 / 3;
+}
+/* The Request Queue visualization spans two columns later */
+.metrics-grid > .wide-widget:nth-child(4) {
+    grid-column: 1 / 3;
+}
+
+/* Placeholder for charts */
+.chart-area {
+    min-height: 150px;
+    background-color: #333355;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* --- 5. Controls and Indicators --- */
+.server-status-indicator {
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    background-color: #f44336; /* Default: Red/Offline */
+    color: white;
+}
+.server-status-indicator.active {
+    background-color: #4CAF50; /* Green: Online */
+}
+
+.control-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.toggle-btn { background-color: #f44336; color: white; }
+.visualize-btn { background-color: #00bcd4; color: #1a1a2e; }
+
+/* Thread Gauge */
+.thread-gauge {
+    height: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.thread-fill {
+    height: 100%;
+    background-color: #00bcd4;
+    transition: width 0.3s;
+}
+
+/* --- 6. Logs and Tables --- */
+.log-feed {
+    height: 150px;
+    overflow-y: scroll;
+    padding-right: 5px;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+.log-entry {
+    font-size: 0.85em;
+    margin: 2px 0;
+    padding: 3px 0;
+    white-space: nowrap; /* Prevent line breaks */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Use ellipsis for overflow */
+}
+.log-entry.critical { color: #f44336; font-weight: 600; }
+.log-entry.warning { color: #ff9800; }
+.log-entry.info { color: #00bcd4; } /* Security info */
+.log-entry.stream-200 { color: #4CAF50; } /* HTTP 200 */
+.log-entry.stream-404 { color: #ff9800; } /* HTTP 404 */
+
+.client-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+.client-table th, .client-table td {
+    padding: 8px 0;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+.client-table thead th { color: #00bcd4; }
+
+
+/* --- 7. Request Queue Visualization --- */
+.buffer-visualization {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.buffer-label {
+    font-size: 0.8em;
+    opacity: 0.8;
+    padding: 0 10px;
+}
+.buffer-items {
+    display: flex;
+    flex-grow: 1;
+    height: 30px;
+    background-color: #333;
+    border: 2px solid #555;
+    border-radius: 4px;
+    padding: 3px;
+    gap: 3px;
+}
+.item {
+    width: 10%; /* Divide the buffer visually */
+    background-color: #00bcd4;
+    border-radius: 2px;
+    transition: background-color 0.3s;
+}
+.item.empty { background-color: transparent; border: 1px dashed #555; }
+.item.lock { background-color: #f44336; } /* Semaphore lock visual */

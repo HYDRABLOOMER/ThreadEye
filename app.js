@@ -1,7 +1,11 @@
 const express=require("express");
 const cors=require("cors");
 const mongoose=require("mongoose");
-const authroutes = require("./routes/authroutes")
+
+//routes and middleware
+const authroutes = require("./routes/authroutes");
+const authenticate=require("./middleware/auth");
+
 const path=require("path");
 const cookieParser = require("cookie-parser");
 const app=express();
@@ -16,8 +20,11 @@ app.get("/",(req,res)=>{
 app.get("/signup",(req,res)=>{
     res.sendFile(path.join(__dirname,"src","signup.html"));
 })
-app.get("/profile",(req,res)=>{
+app.get("/profile",authenticate,(req,res)=>{
     res.sendFile(path.join(__dirname,"src","profile.html"));
+})
+app.get("/dash",authenticate,(req,res)=>{
+    res.sendFile(path.join(__dirname,"src","serverdash.html"));
 })
 app.use("/api/auth",authroutes);
 

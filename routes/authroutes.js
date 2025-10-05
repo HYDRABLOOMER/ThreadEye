@@ -1,6 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const User = require("../model/userModel");
+
+const authenticate=require("../middleware/auth");
 const jwt=require("jsonwebtoken");
 
 const router =express.Router();
@@ -13,7 +15,7 @@ router.post("/login",async (req,res) => {
         if(!user)return res.status(400).json({message:"User not found"});
     const isMatch =await bcrypt.compare(password,user.password);
     if(!isMatch) return res.status(400).json({message:"Invalid Credentials"})
-    const token=jwt.sign({email},"ThreadEye",{expiresIn : "15m"})
+    const token=jwt.sign({Email:user.email,id:user._id},"ThreadEye",{expiresIn : "15m"})
     res.cookie("Token",token,{
         httpOnly:true,
         secure:false,
@@ -51,6 +53,19 @@ router.post("/signup",async(req,res)=>{
     }catch(err){
         res.status(500).json({message:"Server error",error : err.message});
     }
+});
+
+router.get("/status",authenticate,(req,res)=>{
+    console.log("statue route");
+    if(req.user)
+        console.log("user",req.user.Email);
+        return res.json({
+        authenticated:true,
+        user:{email:req.user.Email,id:req.user.id}
+    });
+    res.json({
+        authenticated:false
+    });
 });
 
 module.exports=router;
