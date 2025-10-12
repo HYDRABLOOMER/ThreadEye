@@ -1,67 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Toggle Switch Styling */
+    .role-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #2196f3;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+
+    .role-label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
 </head>
+
 <body>
-    <section>
+  <section>
     <div class="login-box">
-        <form action="submit" id="loginform">
-            <span></span>
-            <h1>Thread-Eye</h1>
-            <h2>Log-in</h2>
-            <div class="input-box">
-                <span class="icon">
-                    <ion-icon name="mail"></ion-icon></span>
-                    <input type="email" id="email" required>
-                    <label for="email">E-mail</label>
-                
-            </div>
-            <div class="input-box">
-                <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
-                    <input type="password" id="password" required>
-                    <label>Password</label>
-            </div>
-            <div class="remember-forgot">
-                <label>
-                    <input id="rememberMe" type="checkbox">
-                    Remember me
-                </label>
-                <a href="/signup">Forgot Password</a>
-            </div>
-            <button type="submit">Login</button>
-            <div class="register-link">
-                <p>Don't have an account?<a href="/signup">Register</a></p>
-            </div>
+      <form action="submit" id="loginform">
+        <span></span>
+        <h1>Thread-Eye</h1>
+        <h2>Log-in</h2>
 
-        </form>
+        <div class="input-box">
+          <span class="icon"><ion-icon name="mail"></ion-icon></span>
+          <input type="email" id="email" required>
+          <label for="email">E-mail</label>
+        </div>
+
+        <div class="input-box">
+          <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+          <input type="password" id="password" required>
+          <label>Password</label>
+        </div>
+
+        <div class="remember-forgot">
+          <label>
+            <input id="rememberMe" type="checkbox">
+            Remember me
+          </label>
+          <a href="/signup">Forgot Password</a>
+        </div>
+
+        <!-- Role Toggle Switch -->
+        <div class="role-toggle">
+          <span class="role-label">User</span>
+          <label class="switch">
+            <input type="checkbox" id="roleSwitch">
+            <span class="slider"></span>
+          </label>
+          <span class="role-label">Admin</span>
+        </div>
+
+        <button type="submit">Login</button>
+
+        <div class="register-link">
+          <p>Don't have an account?<a href="/signup">Register</a></p>
+        </div>
+      </form>
     </div>
-</section>
-<script>
-    document.getElementById("loginform").addEventListener("submit",async(e)=>{
-        e.preventDefault();
-        const email=document.getElementById("email").value;
-        const password=document.getElementById("password").value;
-        const rememberMe=document.getElementById("rememberMe").value;
+  </section>
 
-        const res=await fetch("http://localhost:4000/api/auth/login",{
-            method: "POST",
-            headers : {"Content-Type" : "application/json"},
-            body: JSON.stringify({email,password,rememberMe})
-        });
-        const data = await res.json();
-            if(res.ok){
-                alert("Login - Successful!");
-                window.location.href = "/profile";
-            } else {
-                alert(data.message || "Log-in failed!");
-            }
+  <script>
+    document.getElementById("loginform").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const rememberMe = document.getElementById("rememberMe").checked;
+      const roleSwitch = document.getElementById("roleSwitch").checked;
+      const role = roleSwitch ? "admin" : "user"; // determine role based on toggle
+
+      const res = await fetch("http://localhost:4000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, rememberMe, role })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Login Successful!");
+        if (data.user.role === "admin") {
+          window.location.href = '/admindash';
+        } else {
+          window.location.href = '/userdash';
+        }
+      } else {
+        alert(data.message || "Login failed!");
+      }
     });
-</script>
-<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  </script>
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

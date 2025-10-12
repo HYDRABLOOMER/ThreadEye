@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThreadEye | Client Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Roboto Mono", monospace;
+      background-color: #0f1117;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1a1d29;
+      padding: 12px 24px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #00d4ff;
+    }
+    .navbar .profile {
+      font-weight: 500;
+    }
+    .navbar a {
+      color: #f0f0f0;
+      text-decoration: none;
+      margin-left: 15px;
+      transition: color 0.3s;
+    }
+    .navbar a:hover {
+      color: #00d4ff;
+    }
+
+    /* Layout */
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      height: calc(100vh - 60px);
+    }
+
+    /* Left Panel */
+    .sidebar {
+      background-color: #14161e;
+      padding: 20px;
+      border-right: 2px solid #00d4ff33;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar h2 {
+      color: #00d4ff;
+      text-align: center;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+
+    .server-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .server-item {
+      background-color: #1f2233;
+      border: 1px solid #00d4ff33;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .server-item:hover {
+      background-color: #23273a;
+      transform: scale(1.02);
+    }
+
+    .server-item h3 {
+      margin: 0;
+      color: #00d4ff;
+      font-size: 1rem;
+    }
+    .server-item p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    /* Map Container */
+    #mapContainer {
+      position: relative;
+      height: 100%;
+    }
+    #serverMap {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Chat Window */
+    #chatSection {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      right: 15px;
+      background-color: rgba(20, 22, 30, 0.95);
+      border-radius: 10px;
+      border: 1px solid #00d4ff33;
+      display: none;
+      flex-direction: column;
+      padding: 10px;
+    }
+    #messages {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 150px;
+      overflow-y: auto;
+      border-bottom: 1px solid #00d4ff33;
+      margin-bottom: 10px;
+    }
+    #messages li {
+      padding: 5px;
+    }
+    #msgInput {
+      width: 75%;
+      padding: 5px;
+      border: none;
+      border-radius: 5px;
+      margin-right: 5px;
+      outline: none;
+    }
+    #sendBtn {
+      padding: 6px 10px;
+      background-color: #00d4ff;
+      border: none;
+      border-radius: 5px;
+      color: #0f1117;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+    #sendBtn:hover {
+      background-color: #00b7e6;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="logo">ThreadEye</div>
+    <div class="profile" id="profile"><a href="/login">Login</a></div>
+  </nav>
+
+  <div class="main">
+    <!-- Left: Server List -->
+    <div class="sidebar">
+      <h2>Available Servers</h2>
+      <ul class="server-list" id="serversList"></ul>
+    </div>
+
+    <!-- Right: Map -->
+    <div id="mapContainer">
+      <div id="serverMap"></div>
+
+      <div id="chatSection">
+        <ul id="messages"></ul>
+        <div style="display:flex;">
+          <input id="msgInput" placeholder="Type a message..." />
+          <button id="sendBtn">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="http://127.0.0.1:4000/socket.io/socket.io.js"></script>
+  <script>
+    const serversList = document.getElementById("serversList");
+    const mainSocket = io("http://127.0.0.1:4000");
+    const map = L.map("serverMap").setView([20.5937, 78.9629], 4);
+    const markers = {};
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    let dynamicSocket = null;
+
+    // --- AUTH CHECK ---
+    async function checkAuth() {
+      const res = await fetch("/api/auth/status", { credentials: "include" });
+      const data = await res.json();
+      const navbar = document.getElementById("profile");
+      if (data.authenticated) {
+        navbar.innerHTML = `<span>${data.user.email}</span> <a href="/logout">Logout</a>`;
+      } else {
+        navbar.innerHTML = `<a href="/login">Login</a>`;
+      }
+    }
+    checkAuth();
+
+    // --- SERVER UPDATE ---
+    mainSocket.on("updateServers", (servers) => {
+      serversList.innerHTML = "";
+      Object.values(markers).forEach((m) => map.removeLayer(m));
+      Object.keys(markers).forEach((k) => delete markers[k]);
+
+      if (servers.length === 0) {
+        serversList.innerHTML = "<li>No servers online yet.</li>";
+      } else {
+        servers.forEach(({ host, port, name, location }) => {
+          const item = document.createElement("li");
+          item.className = "server-item";
+          item.innerHTML = `<h3>${name || "Server"}</h3><p>${host}:${port}</p>`;
+          item.onclick = () => connectToServer(host, port);
+          serversList.appendChild(item);
+
+          if (location && location.lat && location.lng) {
+            const marker = L.marker([location.lat, location.lng])
+              .addTo(map)
+              .bindPopup(`<b>${name || "Server"}</b><br>Click to connect`)
+              .on("click", () => connectToServer(host, port));
+            markers[`${host}:${port}`] = marker;
+          }
+        });
+      }
+    });
+
+    // --- CONNECT FUNCTION ---
+    function connectToServer(host, port) {
+      if (dynamicSocket) dynamicSocket.disconnect();
+      dynamicSocket = io(`http://${host}:${port}`);
+
+      const chat = document.getElementById("chatSection");
+      const messages = document.getElementById("messages");
+      const msgInput = document.getElementById("msgInput");
+      const sendBtn = document.getElementById("sendBtn");
+
+      messages.innerHTML = "";
+      chat.style.display = "flex";
+
+      dynamicSocket.on("connect", () => {
+        const li = document.createElement("li");
+        li.textContent = `Connected to ${host}:${port}`;
+        messages.appendChild(li);
+      });
+
+      dynamicSocket.on("message", (msg) => {
+        const li = document.createElement("li");
+        li.textContent = msg;
+        messages.appendChild(li);
+      });
+
+      sendBtn.onclick = () => {
+        const msg = msgInput.value.trim();
+        if (!msg) return;
+        dynamicSocket.emit("message", msg);
+        const li = document.createElement("li");
+        li.textContent = `You: ${msg}`;
+        messages.appendChild(li);
+        msgInput.value = "";
+      };
+    }
+  </script>
+</body>
+</html>

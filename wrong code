@@ -1,0 +1,258 @@
+app.js
+
+express=require("express");
+const cors=require("cors");
+const http=require("http");
+const {Server}=require("socket.io");
+const mongoose=require("mongoose");
+
+//routes and middleware
+const authroutes = require("./routes/authroutes");
+const authenticate=require("./middleware/auth");
+
+const path=require("path");
+const cookieParser = require("cookie-parser");
+
+const app=express();
+const server=http.createServer(app);
+const io=new Server(server,{
+    cors:{
+        origin:"*"
+    }
+});
+
+let dynamicServers=[];
+let basePort = 4000;
+
+app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
+app.use(express.static("src"));
+
+app.get("/",(req,res)=>{
+    res.sendFile(path.join(__dirname,"src","login.html"));
+})
+app.get("/signup",(req,res)=>{
+    res.sendFile(path.join(__dirname,"src","signup.html"));
+})
+app.get("/profile",authenticate,(req,res)=>{
+    res.sendFile(path.join(__dirname,"src","profile.html"));
+})
+app.get("/dash",authenticate,(req,res)=>{
+    res.sendFile(path.join(__dirname,"src","serverdash.html"));
+})
+app.use("/api/auth",authroutes);
+
+app.get("/start",(req,res)=>{
+    const port=basePort+dynamicServers.length;
+    const host="127.0.0.1";
+    const dynamicServer=http.createServer();
+    const dynamicIo=new Server(dynamicServer,{
+        cors:{
+            origin:"*"
+        }
+    });
+    dynamicIo.on("connection", (socket) => {
+        console.log(`Client connected to dynamic server ${host}:${port} - ${socket.id}`);
+        socket.on("message", (msg) => socket.broadcast.emit("message", msg));
+    });
+    dynamicServer.listen(port, () => {
+        console.log(`Dynamic server running at ${host}:${port}`);
+        dynamicServers.push({ host, port });
+        io.emit("updateServers", dynamicServers);
+        res.json({ message: `Server started at ${host}:${port}`, host, port });
+    });
+})
+
+io.on("connection",(socket)=>{
+    console.log("Client connected to main server:", socket.id);
+    socket.emit("updateServers", dynamicServers);
+});
+
+server.listen(4000, () => console.log("Main server running on port 4000"));
+
+mongoose.connect("mongodb://127.0.0.1:27017/loginDB").then(()=>{
+    console.log("✅ Database Connected")
+}).catch(err => console.error("Database connection error"));
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThreadEye</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto Mono', monospace;
+      background-color: #0f1117;
+      color: #f0f0f0;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1a1d29;
+      padding: 12px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #00d4ff;
+    }
+
+    .navbar .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .navbar .nav-links a {
+      color: #f0f0f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .navbar .nav-links a:hover {
+      color: #00d4ff;
+    }
+
+    .navbar .profile {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .navbar .profile-icon {
+      font-size: 1.4rem;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">ThreadEye</div>
+
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Search</a>
+      <a href="#">Log</a>
+      <a href="#">Security</a>
+    </div>
+
+    <div class="profile" id="profile">
+      <span class="profile-icon">👤</span>
+      <a href="/login">Log-in</a>
+    </div>
+  </nav>
+  <h1>Dynamic Socket.IO Lobby</h1>
+
+  <!-- Button to create a server -->
+  <button id="cbtn">Start My Server</button>
+
+  <h2>Available Servers:</h2>
+  <ul id="serversList"></ul>
+
+  <div id="chatSection">
+    <h2>Chat Room</h2>
+    <ul id="messages"></ul>
+    <input id="msgInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+  <script src="http://127.0.0.1:4000/socket.io/socket.io.js"></script>
+  <script>
+    const mainSocket = io("http://127.0.0.1:4000");
+
+const serversList = document.getElementById("serversList");
+const createServerBtn = document.getElementById("cbtn");
+
+let dynamicSocket = null;
+
+// When "Start My Server" button is clicked
+createServerBtn.addEventListener("click", async () => {
+    console.log("button clicked");
+    try {
+        console.log("button licker")
+        const res = await fetch("http://127.0.0.1:4000/start");
+        const data = await res.json();
+        alert(data.message);
+    } catch (err) {
+        console.error("Error starting server:", err);
+    }
+});
+
+// Real-time update of available servers
+mainSocket.on("updateServers", (servers) => {
+    serversList.innerHTML = "";
+
+    if (servers.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "No servers online yet.";
+        serversList.appendChild(li);
+        return;
+    }
+
+    servers.forEach(({ host, port }) => {
+        const li = document.createElement("li");
+        li.textContent = `Server @ ${host}:${port}`;
+        li.onclick = () => connectToServer(host, port);
+        serversList.appendChild(li);
+    });
+});
+
+function connectToServer(host, port) {
+    if (dynamicSocket) dynamicSocket.disconnect();
+
+    dynamicSocket = io(`http://${host}:${port}`);
+
+    document.getElementById("chatSection").style.display = "block";
+
+    const messages = document.getElementById("messages");
+    const msgInput = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    // Clear previous messages
+    messages.innerHTML = "";
+
+    dynamicSocket.on("connect", () => {
+        console.log("Connected to dynamic server:", dynamicSocket.id);
+    });
+
+    dynamicSocket.on("message", (msg) => {
+        const li = document.createElement("li");
+        li.textContent = msg;
+        messages.appendChild(li);
+    });
+
+    sendBtn.onclick = () => {
+        const msg = msgInput.value.trim();
+        if (!msg) return;
+        dynamicSocket.emit("message", msg);
+        const li = document.createElement("li");
+        li.textContent = `You: ${msg}`;
+        messages.appendChild(li);
+        msgInput.value = "";
+    };
+}
+   async function check(){
+        const res=await fetch("/api/auth/status",{credentials:"include"});
+        const data=await res.json();
+        if(data.authenticated){
+        const navbar=document.getElementById("profile");
+        navbar.innerHTML=`<span>${data.user.email} </span> <a href="/logout"> Logout</a>`;
+        }
+        else{
+            navbar.innerHTML='<a href="/login">Login</a>';
+        }
+   }
+   check();    
+  </script>
+  
+</body>
+</html>

@@ -15,16 +15,16 @@ router.post("/login",async (req,res) => {
         if(!user)return res.status(400).json({message:"User not found"});
     const isMatch =await bcrypt.compare(password,user.password);
     if(!isMatch) return res.status(400).json({message:"Invalid Credentials"})
-    const token=jwt.sign({Email:user.email,id:user._id},"ThreadEye",{expiresIn : "15m"})
+    const token=jwt.sign({Email:user.email,id:user._id,role: user.role},"ThreadEye",{expiresIn : "15m"})
     res.cookie("Token",token,{
         httpOnly:true,
         secure:false,
         sameSite:"Strict",
-        maxAge: rememberMe?7*24*60*60*1000:undefined
+        maxAge: rememberMe?7*24*60*60*1000:undefined,
     });
     res.json({
         message:"Login Successfull",
-        user: {username:user.username,email:user.email}
+        user: {username:user.username,email:user.email,role:user.role},
         });
     }catch(err){
         console.log("mongoose error",err);
@@ -37,7 +37,7 @@ router.post("/login",async (req,res) => {
 
 router.post("/signup",async(req,res)=>{
     try{
-        const{username,email,password}=req.body;
+        const{username,email,password,role}=req.body;
         const existingUser =await User.findOne({email});
         if(existingUser){
             return res.status(400).json({
@@ -46,7 +46,7 @@ router.post("/signup",async(req,res)=>{
         }
         const hashPass = await bcrypt.hash(password,10);
 
-        const newUser = new User({username,email,password:hashPass});
+        const newUser = new User({username,email,password:hashPass,role:role||"user"});
         await newUser.save();
 
         res.json({message:"User Successfully Registered"});

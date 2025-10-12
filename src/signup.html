@@ -41,7 +41,14 @@
                     <input type="password" id="confirmPassword" required>
                     <label>Confirm Password</label>
                 </div>
-
+                 <div class="role-toggle">
+          <span class="role-label">User</span>
+          <label class="switch">
+            <input type="checkbox" id="roleSwitch">
+            <span class="slider"></span>
+          </label>
+          <span class="role-label">Admin</span>
+        </div>
                 <!-- Remember me / terms -->
                 <div class="remember-forgot">
                     <label>
@@ -66,6 +73,8 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
+            const roleSwitch = document.getElementById("roleSwitch").checked;
+            const role = roleSwitch ? "admin" : "user";
 
             if(password !== confirmPassword) {
                 alert("Passwords do not match!");
@@ -75,7 +84,7 @@
             const res = await fetch("/api/auth/signup", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({username:name, email, password})
+                body: JSON.stringify({username:name, email, password,role})
             });
 
             const data = await res.json();

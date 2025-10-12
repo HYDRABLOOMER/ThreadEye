@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ThreadEye</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <style>
     body {
       margin: 0;
@@ -22,72 +23,165 @@
       padding: 12px 24px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     }
+    .navbar .logo { font-size: 1.5rem; font-weight: 600; color: #00d4ff; }
+    .navbar .nav-links { display: flex; gap: 24px; }
+    .navbar .nav-links a { color: #f0f0f0; text-decoration: none; font-weight: 500; transition: color 0.2s ease; }
+    .navbar .nav-links a:hover { color: #00d4ff; }
+    .navbar .profile { display: flex; align-items: center; cursor: pointer; font-weight: 500; }
+    .navbar .profile-icon { font-size: 1.4rem; margin-right: 8px; }
 
-    .navbar .logo {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #00d4ff;
-    }
-
-    .navbar .nav-links {
-      display: flex;
-      gap: 24px;
-    }
-
-    .navbar .nav-links a {
-      color: #f0f0f0;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
-    }
-
-    .navbar .nav-links a:hover {
-      color: #00d4ff;
-    }
-
-    .navbar .profile {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .navbar .profile-icon {
-      font-size: 1.4rem;
-      margin-right: 8px;
-    }
+    #chatSection { display: none; margin-top: 20px; }
+    #messages { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #333; margin-bottom: 10px; }
+    #msgInput { width: 70%; padding: 5px; margin-right: 5px; }
+    #sendBtn { padding: 5px 10px; }
+    #serverMap { width: 100%; height: 500px; margin-top: 20px; }
   </style>
 </head>
 <body>
+
   <nav class="navbar">
     <div class="logo">ThreadEye</div>
-
     <div class="nav-links">
       <a href="#">Home</a>
       <a href="#">Search</a>
       <a href="#">Log</a>
       <a href="#">Security</a>
     </div>
-
     <div class="profile" id="profile">
       <span class="profile-icon">👤</span>
       <a href="/login">Log-in</a>
     </div>
   </nav>
 
+  <h1>Dynamic Socket.IO Lobby</h1>
+  <button id="cbtn">Start My Server</button>
+
+  <h2>Available Servers:</h2>
+  <ul id="serversList"></ul>
+
+  <div id="chatSection">
+    <h2>Chat Room</h2>
+    <ul id="messages"></ul>
+    <input id="msgInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <div id="serverMap"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="http://127.0.0.1:4000/socket.io/socket.io.js"></script>
+
   <script>
-   async function check(){
-        const res=await fetch("/api/auth/status",{credentials:"include"});
-        const data=await res.json();
-        if(data.authenticated){
-        const navbar=document.getElementById("profile");
-        navbar.innerHTML=`<span>${data.user.email} </span> <a href="/logout"> Logout</a>`;
+    window.addEventListener("DOMContentLoaded", () => {
+      console.log("JS loaded ✅");
+
+      const serversList = document.getElementById("serversList");
+      const createServerBtn = document.getElementById("cbtn");
+      const mainSocket = io("http://127.0.0.1:4000");
+      let dynamicSocket = null;
+
+      // --- Initialize Map ---
+      const map = L.map("serverMap").setView([20.5937, 78.9629], 4);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(map);
+
+      // Start server using client's geolocation
+      createServerBtn.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          alert("Geolocation is not supported by your browser.");
+          return;
         }
-        else{
-            navbar.innerHTML='<a href="/login">Login</a>';
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          try {
+            const res = await fetch("/start", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ lat: latitude, lng: longitude })
+            });
+            const data = await res.json();
+            alert(data.message);
+          } catch (err) {
+            console.error("Error starting server:", err);
+          }
+        }, (err) => {
+          console.error("Location access denied:", err.message);
+          alert("Please allow location access to start a server.");
+        });
+      });
+
+      // Update servers list & map in real-time
+      mainSocket.on("updateServers", (servers) => {
+        serversList.innerHTML = "";
+
+        if (servers.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "No servers online yet.";
+          serversList.appendChild(li);
+        } else {
+          servers.forEach(({ host, port, name, location }) => {
+            // List
+            const li = document.createElement("li");
+            li.textContent = `Server @ ${host}:${port}`;
+            li.style.cursor = "pointer";
+            li.onclick = () => connectToServer(host, port);
+            serversList.appendChild(li);
+
+            // Map
+            if (location && location.lat) {
+              L.marker([location.lat, location.lng])
+                .addTo(map)
+                .bindPopup(`<b>${name}</b><br>Port: ${port}`);
+            }
+          });
         }
-   }
-   check();    
+      });
+
+      function connectToServer(host, port) {
+        if (dynamicSocket) dynamicSocket.disconnect();
+
+        dynamicSocket = io(`http://${host}:${port}`);
+        document.getElementById("chatSection").style.display = "block";
+
+        const messages = document.getElementById("messages");
+        const msgInput = document.getElementById("msgInput");
+        const sendBtn = document.getElementById("sendBtn");
+        messages.innerHTML = "";
+
+        dynamicSocket.on("connect", () => console.log("Connected to dynamic server:", dynamicSocket.id));
+        dynamicSocket.on("message", (msg) => {
+          const li = document.createElement("li");
+          li.textContent = msg;
+          messages.appendChild(li);
+        });
+
+        sendBtn.onclick = () => {
+          const msg = msgInput.value.trim();
+          if (!msg) return;
+          dynamicSocket.emit("message", msg);
+          const li = document.createElement("li");
+          li.textContent = `You: ${msg}`;
+          messages.appendChild(li);
+          msgInput.value = "";
+        };
+      }
+
+      // Auth check for navbar
+      async function check() {
+        const res = await fetch("/api/auth/status", { credentials: "include" });
+        const data = await res.json();
+        const navbar = document.getElementById("profile");
+        if (data.authenticated) {
+          navbar.innerHTML = `<span>${data.user.email}</span> <a href="/logout"> Logout</a>`;
+        } else {
+          navbar.innerHTML = '<a href="/login">Login</a>';
+        }
+      }
+      check();
+    });
   </script>
 </body>
 </html>
