@@ -30,11 +30,260 @@
     .navbar .profile { display: flex; align-items: center; cursor: pointer; font-weight: 500; }
     .navbar .profile-icon { font-size: 1.4rem; margin-right: 8px; }
 
-    #chatSection { display: none; margin-top: 20px; }
-    #messages { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #333; margin-bottom: 10px; }
-    #msgInput { width: 70%; padding: 5px; margin-right: 5px; }
-    #sendBtn { padding: 5px 10px; }
-    #serverMap { width: 100%; height: 500px; margin-top: 20px; }
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .upload-section, .metrics-section, .locks-section, .server-section, .map-section {
+      background-color: #1a1d29;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #00d4ff33;
+    }
+
+    .upload-section {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .metrics-section {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .locks-section {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .server-section {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .map-section {
+      grid-column: 1 / -1;
+      grid-row: 3;
+    }
+
+    /* Upload Styles */
+    .upload-area {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    #fileInput {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #00d4ff33;
+      border-radius: 5px;
+      background-color: #14161e;
+      color: #f0f0f0;
+    }
+
+    #uploadBtn {
+      padding: 8px 16px;
+      background-color: #00d4ff;
+      border: none;
+      border-radius: 5px;
+      color: #0f1117;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    #uploadBtn:hover {
+      background-color: #00b7e6;
+    }
+
+    #uploadStatus {
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    #uploadStatus.success {
+      background-color: #1a4d1a;
+      border: 1px solid #4caf50;
+      color: #4caf50;
+      display: block;
+    }
+
+    #uploadStatus.error {
+      background-color: #4d1a1a;
+      border: 1px solid #f44336;
+      color: #f44336;
+      display: block;
+    }
+
+    /* Metrics Styles */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .metric-card {
+      background-color: #14161e;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid #00d4ff33;
+    }
+
+    .metric-card h3 {
+      margin: 0 0 10px 0;
+      color: #00d4ff;
+      font-size: 0.9rem;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
+    /* Locks Styles */
+    .lock-item {
+      background-color: #14161e;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-left: 3px solid #ff6b6b;
+    }
+
+    .lock-item h4 {
+      margin: 0 0 5px 0;
+      color: #ff6b6b;
+    }
+
+    .lock-item p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #ccc;
+    }
+
+    /* Chat Section */
+    #chatSection { 
+      display: none; 
+      margin-top: 20px; 
+      background-color: #1a1d29;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #00d4ff33;
+    }
+    
+    #messages { 
+      list-style: none; 
+      padding: 0; 
+      max-height: 200px; 
+      overflow-y: auto; 
+      border: 1px solid #333; 
+      margin-bottom: 10px; 
+      background-color: #14161e;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    
+    #msgInput { 
+      width: 70%; 
+      padding: 8px; 
+      margin-right: 5px; 
+      border: 1px solid #00d4ff33;
+      border-radius: 5px;
+      background-color: #14161e;
+      color: #f0f0f0;
+    }
+    
+    #sendBtn { 
+      padding: 8px 16px; 
+      background-color: #00d4ff;
+      border: none;
+      border-radius: 5px;
+      color: #0f1117;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    #serverMap { 
+      width: 100%; 
+      height: 400px; 
+      margin-top: 20px; 
+      border-radius: 10px;
+    }
+
+    /* Server List */
+    #serversList {
+      list-style: none;
+      padding: 0;
+    }
+
+    #serversList li {
+      background-color: #14161e;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    #serversList li:hover {
+      background-color: #23273a;
+    }
+
+    #cbtn {
+      padding: 10px 20px;
+      background-color: #00d4ff;
+      border: none;
+      border-radius: 5px;
+      color: #0f1117;
+      cursor: pointer;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    #cbtn:hover {
+      background-color: #00b7e6;
+    }
+
+    /* Charts Styles */
+    .charts-container {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #00d4ff33;
+    }
+
+    .charts-container h3 {
+      color: #00d4ff;
+      margin-bottom: 15px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .chart-item {
+      background-color: #14161e;
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid #00d4ff33;
+    }
+
+    .chart-item canvas {
+      max-height: 200px;
+    }
   </style>
 </head>
 <body>
@@ -53,22 +302,84 @@
     </div>
   </nav>
 
-  <h1>Dynamic Socket.IO Lobby</h1>
-  <button id="cbtn">Start My Server</button>
+  <div class="dashboard-container">
+    <!-- File Upload Section -->
+    <div class="upload-section">
+      <h2>📁 File Management</h2>
+      <div class="upload-area">
+        <input type="file" id="fileInput" accept="*/*" />
+        <button id="uploadBtn">Upload File</button>
+      </div>
+      <div id="uploadStatus"></div>
+    </div>
 
-  <h2>Available Servers:</h2>
-  <ul id="serversList"></ul>
+    <!-- Metrics Section -->
+    <div class="metrics-section">
+      <h2>📊 System Metrics</h2>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <h3>Total Users</h3>
+          <div class="metric-value" id="totalUsers">0</div>
+        </div>
+        <div class="metric-card">
+          <h3>Active Connections</h3>
+          <div class="metric-value" id="activeConnections">0</div>
+        </div>
+        <div class="metric-card">
+          <h3>Latency</h3>
+          <div class="metric-value" id="latency">0ms</div>
+        </div>
+        <div class="metric-card">
+          <h3>Throughput</h3>
+          <div class="metric-value" id="throughput">0 req/s</div>
+        </div>
+      </div>
+    </div>
 
-  <div id="chatSection">
-    <h2>Chat Room</h2>
-    <ul id="messages"></ul>
-    <input id="msgInput" placeholder="Type a message..." />
-    <button id="sendBtn">Send</button>
+    <!-- File Locks Section -->
+    <div class="locks-section">
+      <h2>🔒 Active File Locks</h2>
+      <div id="locksList"></div>
+      
+      <!-- Charts Section -->
+      <div class="charts-container">
+        <h3>📈 Activity Charts</h3>
+        <div class="chart-grid">
+          <div class="chart-item">
+            <canvas id="locksChart"></canvas>
+          </div>
+          <div class="chart-item">
+            <canvas id="usersChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Server Management -->
+    <div class="server-section">
+      <h2>🖥️ Server Management</h2>
+      <button id="cbtn">Start My Server</button>
+      <h3>Available Servers:</h3>
+      <ul id="serversList"></ul>
+    </div>
+
+    <!-- Chat Section -->
+    <div id="chatSection">
+      <h2>💬 Chat Room</h2>
+      <ul id="messages"></ul>
+      <input id="msgInput" placeholder="Type a message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+
+    <!-- Map Section -->
+    <div class="map-section">
+      <h2>🗺️ Server Locations</h2>
+      <div id="serverMap"></div>
+    </div>
   </div>
 
-  <div id="serverMap"></div>
-
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="http://127.0.0.1:4000/socket.io/socket.io.js"></script>
 
   <script>
@@ -79,12 +390,186 @@
       const createServerBtn = document.getElementById("cbtn");
       const mainSocket = io("http://127.0.0.1:4000");
       let dynamicSocket = null;
+      let map;
+      
+      // Chart instances
+      let locksChart = null;
+      let usersChart = null;
+      let metricsHistory = [];
 
-      // --- Initialize Map ---
-      const map = L.map("serverMap").setView([20.5937, 78.9629], 4);
+      // Initialize map
+      map = L.map("serverMap").setView([20.5937, 78.9629], 4);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap contributors"
+        attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
+
+      // Initialize charts
+      initializeCharts();
+
+      // File upload functionality
+      const fileInput = document.getElementById("fileInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const uploadStatus = document.getElementById("uploadStatus");
+
+      uploadBtn.addEventListener("click", async () => {
+        const file = fileInput.files[0];
+        if (!file) {
+          showUploadStatus("Please select a file", "error");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            showUploadStatus(`File "${file.name}" uploaded successfully!`, "success");
+            fileInput.value = "";
+          } else {
+            showUploadStatus(`Upload failed: ${result.message}`, "error");
+          }
+        } catch (error) {
+          console.error("Upload error:", error);
+          showUploadStatus("Upload failed: Network error", "error");
+        }
+      });
+
+      function showUploadStatus(message, type) {
+        uploadStatus.textContent = message;
+        uploadStatus.className = type;
+        setTimeout(() => {
+          uploadStatus.style.display = "none";
+        }, 5000);
+      }
+
+      // Chart initialization
+      function initializeCharts() {
+        // Locks Chart
+        const locksCtx = document.getElementById('locksChart').getContext('2d');
+        locksChart = new Chart(locksCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Locked Files', 'Available Files'],
+            datasets: [{
+              data: [0, 1],
+              backgroundColor: ['#ff6b6b', '#4caf50'],
+              borderColor: ['#ff5252', '#45a049'],
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: '#f0f0f0' }
+              }
+            }
+          }
+        });
+
+        // Users Chart
+        const usersCtx = document.getElementById('usersChart').getContext('2d');
+        usersChart = new Chart(usersCtx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [{
+              label: 'Active Users',
+              data: [],
+              borderColor: '#00d4ff',
+              backgroundColor: 'rgba(0, 212, 255, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { ticks: { color: '#f0f0f0' } },
+              y: { ticks: { color: '#f0f0f0' } }
+            },
+            plugins: {
+              legend: {
+                labels: { color: '#f0f0f0' }
+              }
+            }
+          }
+        });
+      }
+
+      // Metrics updates
+      mainSocket.on("metricsUpdate", (metrics) => {
+        document.getElementById("totalUsers").textContent = metrics.totalUsers;
+        document.getElementById("activeConnections").textContent = metrics.activeConnections;
+        document.getElementById("latency").textContent = `${metrics.latency.toFixed(1)}ms`;
+        document.getElementById("throughput").textContent = `${metrics.throughput.toFixed(1)} req/s`;
+        
+        // Update charts
+        updateCharts(metrics);
+      });
+
+      function updateCharts(metrics) {
+        // Update metrics history
+        metricsHistory.push({
+          timestamp: new Date(metrics.timestamp).toLocaleTimeString(),
+          users: metrics.totalUsers
+        });
+        
+        // Keep only last 10 data points
+        if (metricsHistory.length > 10) {
+          metricsHistory.shift();
+        }
+        
+        // Update users chart
+        if (usersChart) {
+          usersChart.data.labels = metricsHistory.map(m => m.timestamp);
+          usersChart.data.datasets[0].data = metricsHistory.map(m => m.users);
+          usersChart.update();
+        }
+      }
+
+      // File locks updates
+      mainSocket.on("fileLockUpdate", (locks) => {
+        const locksList = document.getElementById("locksList");
+        locksList.innerHTML = "";
+
+        if (locks.length === 0) {
+          locksList.innerHTML = "<p style='color: #666; text-align: center;'>No active file locks</p>";
+        } else {
+          locks.forEach(lock => {
+            const lockItem = document.createElement("div");
+            lockItem.className = "lock-item";
+            lockItem.innerHTML = `
+              <h4>${lock.filename}</h4>
+              <p>Locked by: ${lock.lockedBy}</p>
+              <p>Since: ${new Date(lock.lockedAt).toLocaleTimeString()}</p>
+            `;
+            locksList.appendChild(lockItem);
+          });
+        }
+        
+        // Update locks chart
+        if (locksChart) {
+          locksChart.data.datasets[0].data = [locks.length, Math.max(1, 10 - locks.length)];
+          locksChart.update();
+        }
+      });
+
+      // Send user info to server
+      mainSocket.emit("userInfo", { 
+        user: "admin", 
+        role: "admin",
+        timestamp: new Date()
+      });
 
       // Start server using client's geolocation
       createServerBtn.addEventListener("click", () => {
@@ -116,6 +601,11 @@
       // Update servers list & map in real-time
       mainSocket.on("updateServers", (servers) => {
         serversList.innerHTML = "";
+        map.eachLayer(layer => {
+          if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+          }
+        });
 
         if (servers.length === 0) {
           const li = document.createElement("li");

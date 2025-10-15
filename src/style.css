@@ -203,3 +203,34 @@ button {
       font-size: 14px;
       color: #333;
     }
+
+    .upload-section {
+  background-color: #1f2233;
+  border: 1px solid #00d4ff33;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.upload-section h2 {
+  color: #00d4ff;
+  margin-bottom: 10px;
+}
+
+.upload-section input[type="file"] {
+  color: #ccc;
+  margin-right: 10px;
+}
+
+.upload-section button {
+  background-color: #00d4ff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.upload-section button:hover {
+  background-color: #00b7e6;
+}

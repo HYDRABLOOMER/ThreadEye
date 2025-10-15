@@ -23,10 +23,12 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "gridfs-stream": "^1.1.1",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
+    "multer-gridfs": "^0.0.1",
     "socket.io": "^4.8.1"
   }
 }

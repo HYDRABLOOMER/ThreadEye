@@ -63,11 +63,219 @@
       flex-direction: column;
       overflow-y: auto;
     }
+    
     .sidebar h2 {
       color: #00d4ff;
       text-align: center;
       font-size: 1.3rem;
       margin-bottom: 20px;
+    }
+
+    /* Tabs */
+    .sidebar-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #00d4ff33;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      color: #00d4ff;
+      border-bottom-color: #00d4ff;
+    }
+
+    .tab-btn:hover {
+      color: #00d4ff;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* File List */
+    .file-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .file-item {
+      background-color: #1f2233;
+      border: 1px solid #00d4ff33;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .file-item:hover {
+      background-color: #23273a;
+      transform: scale(1.02);
+    }
+
+    .file-item h3 {
+      margin: 0;
+      color: #00d4ff;
+      font-size: 1rem;
+    }
+
+    .file-item p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .file-item .file-type {
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+
+    /* File Editor */
+    .file-editor {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      bottom: 15px;
+      background-color: rgba(20, 22, 30, 0.95);
+      border-radius: 10px;
+      border: 1px solid #00d4ff33;
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .file-editor.active {
+      display: flex;
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #00d4ff33;
+    }
+
+    .editor-header h3 {
+      margin: 0;
+      color: #00d4ff;
+    }
+
+    .editor-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .editor-controls button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+
+    #lockBtn {
+      background-color: #ff6b6b;
+      color: white;
+    }
+
+    #lockBtn:hover:not(:disabled) {
+      background-color: #ff5252;
+    }
+
+    #lockBtn:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+    }
+
+    #saveBtn {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    #saveBtn:hover:not(:disabled) {
+      background-color: #45a049;
+    }
+
+    #saveBtn:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+    }
+
+    #closeEditor {
+      background-color: #666;
+      color: white;
+    }
+
+    #closeEditor:hover {
+      background-color: #555;
+    }
+
+    .editor-content {
+      flex: 1;
+      padding: 15px;
+    }
+
+    #fileContent {
+      width: 100%;
+      height: 100%;
+      background-color: #14161e;
+      border: 1px solid #00d4ff33;
+      border-radius: 5px;
+      color: #f0f0f0;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      padding: 15px;
+      resize: none;
+      outline: none;
+    }
+
+    #fileContent:disabled {
+      background-color: #1a1a1a;
+      color: #666;
+    }
+
+    #editorStatus {
+      padding: 10px 15px;
+      border-top: 1px solid #00d4ff33;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    #editorStatus.success {
+      background-color: #1a4d1a;
+      color: #4caf50;
+      display: block;
+    }
+
+    #editorStatus.error {
+      background-color: #4d1a1a;
+      color: #f44336;
+      display: block;
+    }
+
+    #editorStatus.info {
+      background-color: #1a3d4d;
+      color: #00d4ff;
+      display: block;
     }
 
     .server-list {
@@ -168,15 +376,43 @@
   </nav>
 
   <div class="main">
-    <!-- Left: Server List -->
+    <!-- Left: Server List & Files -->
     <div class="sidebar">
-      <h2>Available Servers</h2>
-      <ul class="server-list" id="serversList"></ul>
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="servers">Servers</button>
+        <button class="tab-btn" data-tab="files">Files</button>
+      </div>
+      
+      <div id="serversTab" class="tab-content active">
+        <h2>Available Servers</h2>
+        <ul class="server-list" id="serversList"></ul>
+      </div>
+      
+      <div id="filesTab" class="tab-content">
+        <h2>Available Files</h2>
+        <ul class="file-list" id="filesList"></ul>
+      </div>
     </div>
 
-    <!-- Right: Map -->
+    <!-- Right: Map & File Editor -->
     <div id="mapContainer">
       <div id="serverMap"></div>
+
+      <!-- File Editor Section -->
+      <div id="fileEditor" class="file-editor">
+        <div class="editor-header">
+          <h3 id="editorTitle">No file selected</h3>
+          <div class="editor-controls">
+            <button id="lockBtn" disabled>Lock File</button>
+            <button id="saveBtn" disabled>Save</button>
+            <button id="closeEditor">Close</button>
+          </div>
+        </div>
+        <div class="editor-content">
+          <textarea id="fileContent" placeholder="Select a text file to edit..." disabled></textarea>
+        </div>
+        <div id="editorStatus"></div>
+      </div>
 
       <div id="chatSection">
         <ul id="messages"></ul>
@@ -192,6 +428,7 @@
   <script src="http://127.0.0.1:4000/socket.io/socket.io.js"></script>
   <script>
     const serversList = document.getElementById("serversList");
+    const filesList = document.getElementById("filesList");
     const mainSocket = io("http://127.0.0.1:4000");
     const map = L.map("serverMap").setView([20.5937, 78.9629], 4);
     const markers = {};
@@ -201,6 +438,9 @@
     }).addTo(map);
 
     let dynamicSocket = null;
+    let currentFile = null;
+    let isFileLocked = false;
+    let currentUser = null;
 
     // --- AUTH CHECK ---
     async function checkAuth() {
@@ -208,12 +448,258 @@
       const data = await res.json();
       const navbar = document.getElementById("profile");
       if (data.authenticated) {
+        currentUser = data.user.email;
         navbar.innerHTML = `<span>${data.user.email}</span> <a href="/logout">Logout</a>`;
       } else {
+        currentUser = 'anonymous';
         navbar.innerHTML = `<a href="/login">Login</a>`;
       }
+      
+      // Send user info to server
+      mainSocket.emit("userInfo", { 
+        user: currentUser, 
+        role: "user",
+        timestamp: new Date()
+      });
     }
     checkAuth();
+
+    // --- TAB FUNCTIONALITY ---
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        
+        // Update active tab button
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update active tab content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tab + 'Tab').classList.add('active');
+        
+        // Load files if switching to files tab
+        if (tab === 'files') {
+          loadFiles();
+        }
+      });
+    });
+
+    // --- FILE OPERATIONS ---
+    async function loadFiles() {
+      try {
+        const response = await fetch('/files', { credentials: 'include' });
+        const files = await response.json();
+        
+        filesList.innerHTML = '';
+        
+        if (files.length === 0) {
+          filesList.innerHTML = '<li style="color: #666; text-align: center;">No files available</li>';
+          return;
+        }
+        
+        files.forEach(file => {
+          const li = document.createElement('li');
+          li.className = 'file-item';
+          li.innerHTML = `
+            <h3>${file.filename}</h3>
+            <p>Size: ${formatFileSize(file.size)}</p>
+            <p class="file-type">${file.isTextFile ? '📝 Text File' : '📄 Binary File'}</p>
+            <p>Uploaded: ${new Date(file.uploadedAt).toLocaleDateString()}</p>
+          `;
+          
+          li.onclick = () => {
+            if (file.isTextFile) {
+              openTextFile(file);
+            } else {
+              downloadFile(file.filename);
+            }
+          };
+          
+          filesList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error loading files:', error);
+        filesList.innerHTML = '<li style="color: #f44336;">Error loading files</li>';
+      }
+    }
+
+    async function openTextFile(file) {
+      try {
+        const response = await fetch(`/files/text/${file.id}`, { credentials: 'include' });
+        const fileData = await response.json();
+        
+        currentFile = fileData;
+        document.getElementById('editorTitle').textContent = fileData.filename;
+        document.getElementById('fileContent').value = fileData.content;
+        document.getElementById('fileEditor').classList.add('active');
+        
+        // Enable lock button
+        document.getElementById('lockBtn').disabled = false;
+        
+        showEditorStatus('File loaded successfully', 'success');
+      } catch (error) {
+        console.error('Error loading file:', error);
+        showEditorStatus('Error loading file', 'error');
+      }
+    }
+
+    async function downloadFile(filename) {
+      try {
+        const response = await fetch(`/files/download/${filename}`, { credentials: 'include' });
+        const blob = await response.blob();
+        
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Error downloading file:', error);
+        alert('Error downloading file');
+      }
+    }
+
+    // --- FILE EDITING ---
+    document.getElementById('lockBtn').addEventListener('click', async () => {
+      if (!currentFile) return;
+      
+      try {
+        const response = await fetch(`/files/lock/${currentFile.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            user: currentUser, 
+            filename: currentFile.filename,
+            socketId: mainSocket.id 
+          }),
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          isFileLocked = true;
+          document.getElementById('lockBtn').textContent = 'Unlock File';
+          document.getElementById('fileContent').disabled = false;
+          document.getElementById('saveBtn').disabled = false;
+          
+          // Join file editing room
+          mainSocket.emit('joinFileEdit', {
+            fileId: currentFile.id,
+            filename: currentFile.filename,
+            user: currentUser
+          });
+          
+          showEditorStatus('File locked for editing', 'success');
+        } else {
+          const error = await response.json();
+          showEditorStatus(`Cannot lock file: ${error.message}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error locking file:', error);
+        showEditorStatus('Error locking file', 'error');
+      }
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      if (!currentFile || !isFileLocked) return;
+      
+      try {
+        const content = document.getElementById('fileContent').value;
+        const response = await fetch(`/files/text/${currentFile.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content, user: currentUser }),
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          showEditorStatus('File saved successfully', 'success');
+        } else {
+          showEditorStatus('Error saving file', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving file:', error);
+        showEditorStatus('Error saving file', 'error');
+      }
+    });
+
+    document.getElementById('closeEditor').addEventListener('click', () => {
+      if (isFileLocked) {
+        unlockFile();
+      }
+      document.getElementById('fileEditor').classList.remove('active');
+      currentFile = null;
+      isFileLocked = false;
+    });
+
+    async function unlockFile() {
+      if (!currentFile) return;
+      
+      try {
+        await fetch(`/files/unlock/${currentFile.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            user: currentUser,
+            socketId: mainSocket.id 
+          }),
+          credentials: 'include'
+        });
+        
+        // Leave file editing room
+        mainSocket.emit('leaveFileEdit', { fileId: currentFile.id });
+        
+        isFileLocked = false;
+        document.getElementById('lockBtn').textContent = 'Lock File';
+        document.getElementById('fileContent').disabled = true;
+        document.getElementById('saveBtn').disabled = true;
+      } catch (error) {
+        console.error('Error unlocking file:', error);
+      }
+    }
+
+    // --- REAL-TIME UPDATES ---
+    mainSocket.on('fileContentUpdate', (data) => {
+      if (currentFile && isFileLocked) {
+        document.getElementById('fileContent').value = data.content;
+        showEditorStatus(`File updated by ${data.user}`, 'info');
+      }
+    });
+
+    mainSocket.on('fileLocked', (data) => {
+      showEditorStatus(`File is locked by ${data.lockedBy}`, 'error');
+    });
+
+    // Real-time content change detection
+    document.getElementById('fileContent').addEventListener('input', (e) => {
+      if (currentFile && isFileLocked) {
+        mainSocket.emit('fileContentChange', {
+          fileId: currentFile.id,
+          content: e.target.value,
+          user: currentUser
+        });
+      }
+    });
+
+    // --- UTILITY FUNCTIONS ---
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showEditorStatus(message, type) {
+      const status = document.getElementById('editorStatus');
+      status.textContent = message;
+      status.className = type;
+      setTimeout(() => {
+        status.style.display = 'none';
+      }, 3000);
+    }
 
     // --- SERVER UPDATE ---
     mainSocket.on("updateServers", (servers) => {
