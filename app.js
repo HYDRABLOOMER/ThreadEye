@@ -15,6 +15,7 @@ const authenticate=require("./middleware/auth");
 const uploadRoutes=require('./routes/uploadRoutes');
 const fileRoutes=require('./routes/fileRoutes');
 const { Metrics, FileLock } = require('./model/log');
+const serverRegistry = require('./serverRegistry');
 
 const path=require("path");
 const cookieParser = require("cookie-parser");
@@ -51,10 +52,47 @@ app.get("/userdash",authenticate,(req,res)=>{
     res.sendFile(path.join(__dirname,"src","userdash.html"));
 })
 
+// Logout route (GET) - clears cookie and redirects
+app.get("/logout", authenticate, async (req, res) => {
+    try {
+        if (req.user) {
+            const User = require("./model/userModel");
+            const user = await User.findById(req.user.id);
+            if (user && user.statistics && user.statistics.sessions?.length) {
+                const sessions = user.statistics.sessions;
+                const activeSession = [...sessions].reverse().find(s => !s.logoutTime);
+                if (activeSession) {
+                    const logoutTime = new Date();
+                    activeSession.logoutTime = logoutTime;
+                    activeSession.duration = Math.floor((logoutTime - new Date(activeSession.loginTime)) / 1000);
+                    user.statistics.lastLogout = logoutTime;
+                    user.statistics.totalOnlineTime = (user.statistics.totalOnlineTime || 0) + activeSession.duration;
+                    await user.save();
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Error updating logout stats:", err);
+    }
+    res.clearCookie("Token");
+    res.redirect("/login");
+});
+
 app.use("/api/auth",authroutes);
-//upload and fetch files
-app.use("/upload",uploadRoutes);
-app.use('/files',fileRoutes);
+//upload and fetch files (protected)
+app.use("/upload", authenticate, uploadRoutes);
+app.use('/files', authenticate, fileRoutes);
+
+// Get resource allocation (for admin dashboard)
+app.get("/api/resources/allocation", authenticate, async (req, res) => {
+    try {
+        const allocation = await getResourceAllocation();
+        res.json(allocation);
+    } catch (error) {
+        console.error("Error fetching resource allocation:", error);
+        res.status(500).json({ message: "Error fetching resource allocation" });
+    }
+});
 
 // app.get("/start", async (req, res) => {
 //   const port = basePort + dynamicServers.length;
@@ -106,9 +144,10 @@ app.post("/start", async (req, res) => {
 
   dynamicServer.listen(port, () => {
     console.log(`Dynamic server running at ${host}:${port}`);
-    const newServer = { host, port, location, name: `Server-${port}` };
+    const newServer = { host, port, location, name: `Server-${port}`, id: `Server-${port}` };
     dynamicServers.push(newServer);
-    io.emit("updateServers", dynamicServers);
+    serverRegistry.addServer(newServer);
+    io.emit("updateServers", serverRegistry.listServers());
     res.json({ message: `Server started at ${host}:${port}`, ...newServer });
   });
 });
@@ -118,9 +157,42 @@ app.post("/start", async (req, res) => {
 const connectedUsers = new Map();
 let metricsInterval;
 
+// Helper function to get resource allocation
+async function getResourceAllocation() {
+    const locks = await FileLock.find();
+    const allocation = {};
+    
+    locks.forEach(lock => {
+        const key = `${lock.lockedBy}_${lock.serverId || 'main'}`;
+        if (!allocation[key]) {
+            allocation[key] = {
+                user: lock.lockedBy,
+                serverId: lock.serverId || 'main',
+                files: [],
+                readLocks: 0,
+                writeLocks: 0
+            };
+        }
+        
+        allocation[key].files.push({
+            fileId: lock.fileId,
+            filename: lock.filename,
+            lockType: lock.lockType
+        });
+        
+        if (lock.lockType === 'read') {
+            allocation[key].readLocks++;
+        } else {
+            allocation[key].writeLocks++;
+        }
+    });
+    
+    return Object.values(allocation);
+}
+
 io.on("connection",(socket)=>{
     console.log("Client connected to main server:", socket.id);
-    socket.emit("updateServers", dynamicServers);
+    socket.emit("updateServers", serverRegistry.listServers());
     
     // Store user info
     socket.on("userInfo", (userInfo) => {
@@ -132,47 +204,127 @@ io.on("connection",(socket)=>{
         updateMetrics();
     });
     
-    // Handle file editing events
+    // Handle file editing events - read lock by default
     socket.on("joinFileEdit", async (data) => {
-        const { fileId, filename, user } = data;
-        
+        const { fileId, filename, user, lockType = 'read', serverId } = data;
+
         try {
-            // Check if file is already locked
-            const existingLock = await FileLock.findOne({ fileId });
-            if (existingLock && existingLock.socketId !== socket.id) {
-                socket.emit("fileLocked", { 
-                    message: "File is already being edited", 
-                    lockedBy: existingLock.lockedBy 
-                });
-                return;
-            }
-            
             // Join room for this file
             socket.join(`file-${fileId}`);
-            
-            // Create lock if not exists
-            if (!existingLock) {
-                const lock = new FileLock({
-                    fileId,
-                    filename,
-                    lockedBy: user,
-                    socketId: socket.id
-                });
-                await lock.save();
+
+            // Enforce single active lock document per file. If a lock already exists and belongs to someone else, deny.
+            const existingLock = await FileLock.findOne({ fileId });
+            if (existingLock) {
+                if (existingLock.socketId === socket.id || (existingLock.lockedBy && user && String(existingLock.lockedBy.id) === String(user.id))) {
+                    // idempotent: same owner re-joining
+                    socket.emit('fileEditJoined', { fileId, filename, lockType: existingLock.lockType });
+                    io.emit('fileLockUpdate', await FileLock.find());
+                    io.emit('resourceAllocationUpdate', await getResourceAllocation());
+                    return;
+                }
+
+                // somebody else holds the lock
+                socket.emit('fileLocked', { message: 'File is already locked by another user', lockedBy: existingLock.lockedBy, lockType: existingLock.lockType });
+                return;
             }
-            
-            socket.emit("fileEditJoined", { fileId, filename });
-            io.emit("fileLockUpdate", await FileLock.find());
-            
+
+            // No existing lock: create the lock requested by client (read or write). Unique index ensures exclusivity.
+            try {
+                await FileLock.create({ fileId, filename, lockedBy: user, socketId: socket.id, lockType, serverId: serverId || 'main' });
+                socket.emit('fileEditJoined', { fileId, filename, lockType });
+                io.emit('fileLockUpdate', await FileLock.find());
+                io.emit('resourceAllocationUpdate', await getResourceAllocation());
+                return;
+            } catch (err) {
+                if (err && (err.code === 11000 || err.codeName === 'DuplicateKey')) {
+                    const current = await FileLock.findOne({ fileId });
+                    socket.emit('fileLocked', { message: 'File is locked by another user', lockedBy: current?.lockedBy, lockType: current?.lockType });
+                    return;
+                }
+                console.error('Error creating lock:', err);
+                socket.emit('error', { message: 'Failed to acquire lock' });
+                return;
+            }
+
         } catch (error) {
-            console.error("Error joining file edit:", error);
-            socket.emit("error", { message: "Failed to join file editing" });
+            console.error('Error joining file edit:', error);
+            socket.emit('error', { message: 'Failed to join file editing' });
         }
     });
     
-    socket.on("fileContentChange", (data) => {
+    socket.on("fileContentChange", async (data) => {
         const { fileId, content, user } = data;
-        socket.to(`file-${fileId}`).emit("fileContentUpdate", { content, user });
+        try {
+            // Only allow edits from the socket that holds a write lock for this file
+            const writeLock = await FileLock.findOne({ fileId, socketId: socket.id, lockType: 'write' });
+            if (!writeLock) {
+                // Reject edits from non-writers
+                socket.emit('error', { message: 'Edit denied: you must hold a write lock to modify this file' });
+                return;
+            }
+
+            // Broadcast update to other clients in the file room
+            socket.to(`file-${fileId}`).emit("fileContentUpdate", { content, user });
+        } catch (err) {
+            console.error('Error handling fileContentChange:', err);
+            socket.emit('error', { message: 'Server error while processing edit' });
+        }
+    });
+    
+    socket.on("upgradeToWriteLock", async (data) => {
+        const { fileId, user } = data;
+
+        try {
+            const readLock = await FileLock.findOne({ fileId, socketId: socket.id, lockType: 'read' });
+            if (!readLock) {
+                socket.emit('error', { message: "You don't have a read lock on this file" });
+                return;
+            }
+
+            // Check for other read locks
+            const otherReadLocks = await FileLock.find({ fileId, lockType: 'read', socketId: { $ne: socket.id } });
+            if (otherReadLocks.length > 0) {
+                socket.emit('error', { message: 'Other users are reading this file. Cannot upgrade to write lock.', readers: otherReadLocks.map(l => l.lockedBy) });
+                return;
+            }
+
+            // Attempt atomic upgrade using findOneAndUpdate to set lockType to 'write'
+            try {
+                const upgraded = await FileLock.findOneAndUpdate(
+                    { _id: readLock._id, lockType: 'read', socketId: socket.id },
+                    { $set: { lockType: 'write', lockedAt: new Date() } },
+                    { new: true }
+                );
+
+                if (!upgraded) {
+                    socket.emit('error', { message: 'Upgrade failed (state changed)' });
+                    return;
+                }
+
+                // Double-check concurrent readers
+                const concurrentReaders = await FileLock.find({ fileId, lockType: 'read', socketId: { $ne: socket.id } });
+                if (concurrentReaders.length > 0) {
+                    // rollback
+                    await FileLock.findByIdAndUpdate(upgraded._id, { $set: { lockType: 'read' } });
+                    socket.emit('error', { message: 'Cannot upgrade to write lock: other users started reading concurrently', readers: concurrentReaders.map(l => l.lockedBy) });
+                    return;
+                }
+
+                socket.emit('lockUpgraded', { fileId, lockType: 'write' });
+                io.emit('fileLockUpdate', await FileLock.find());
+                io.emit('resourceAllocationUpdate', await getResourceAllocation());
+            } catch (err) {
+                if (err && (err.code === 11000 || err.codeName === 'DuplicateKey')) {
+                    const current = await FileLock.findOne({ fileId, lockType: 'write' });
+                    socket.emit('error', { message: 'Upgrade failed: another user obtained the write lock', lockedBy: current?.lockedBy });
+                    return;
+                }
+                throw err;
+            }
+        } catch (error) {
+            console.error('Error upgrading lock:', error);
+            socket.emit('error', { message: 'Failed to upgrade lock' });
+        }
     });
     
     socket.on("leaveFileEdit", async (data) => {
@@ -181,8 +333,9 @@ io.on("connection",(socket)=>{
         
         try {
             // Remove lock
-            await FileLock.deleteOne({ socketId: socket.id });
+            await FileLock.deleteOne({ socketId: socket.id, fileId });
             io.emit("fileLockUpdate", await FileLock.find());
+            io.emit("resourceAllocationUpdate", await getResourceAllocation());
         } catch (error) {
             console.error("Error leaving file edit:", error);
         }
@@ -253,12 +406,14 @@ app.post("/stop", (req, res) => {
   if (serverObj.instance) {
     serverObj.instance.close(() => {
       dynamicServers.splice(serverIndex, 1);
-      io.emit("updateServers", dynamicServers);
+      serverRegistry.removeServerByPort(port);
+      io.emit("updateServers", serverRegistry.listServers());
       return res.json({ message: `Server on port ${port} stopped successfully` });
     });
   } else {
     dynamicServers.splice(serverIndex, 1);
-    io.emit("updateServers", dynamicServers);
+    serverRegistry.removeServerByPort(port);
+    io.emit("updateServers", serverRegistry.listServers());
     return res.json({ message: `Server on port ${port} removed from list` });
   }
 });

@@ -27,8 +27,12 @@
     .navbar .nav-links { display: flex; gap: 24px; }
     .navbar .nav-links a { color: #f0f0f0; text-decoration: none; font-weight: 500; transition: color 0.2s ease; }
     .navbar .nav-links a:hover { color: #00d4ff; }
-    .navbar .profile { display: flex; align-items: center; cursor: pointer; font-weight: 500; }
-    .navbar .profile-icon { font-size: 1.4rem; margin-right: 8px; }
+    .navbar .profile { display: flex; align-items: center; cursor: pointer; font-weight: 500; gap: 10px; }
+    .navbar .profile-icon { font-size: 1.4rem; }
+    .navbar .profile a { color: #f0f0f0; text-decoration: none; transition: color 0.3s; }
+    .navbar .profile a:hover { color: #00d4ff; }
+    .navbar .profile .user-email { color: #00d4ff; cursor: pointer; text-decoration: none; padding: 5px 10px; border-radius: 5px; transition: background-color 0.3s; }
+    .navbar .profile .user-email:hover { background-color: rgba(0, 212, 255, 0.1); }
 
     /* Dashboard Layout */
     .dashboard-container {
@@ -291,10 +295,8 @@
   <nav class="navbar">
     <div class="logo">ThreadEye</div>
     <div class="nav-links">
-      <a href="#">Home</a>
-      <a href="#">Search</a>
-      <a href="#">Log</a>
-      <a href="#">Security</a>
+      <a href="/admindash">Dashboard</a>
+      <a href="/profile">Profile</a>
     </div>
     <div class="profile" id="profile">
       <span class="profile-icon">👤</span>
@@ -355,26 +357,41 @@
       </div>
     </div>
 
+    <!-- Resource Allocation Section -->
+    <div class="resource-section">
+      <h2>🧭 Resource Allocation</h2>
+      <div class="resource-grid">
+        <div class="resource-summary">
+          <h3>Usage by User & Server</h3>
+          <ul id="resourceAllocationList" class="resource-allocation-list"></ul>
+        </div>
+        <div class="resource-chart-container">
+          <h3>Read vs Write Locks</h3>
+          <canvas id="resourceAllocationChart"></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- Server Management -->
     <div class="server-section">
       <h2>🖥️ Server Management</h2>
-      <button id="cbtn">Start My Server</button>
+  <button id="cbtn">Start My Server</button>
       <h3>Available Servers:</h3>
-      <ul id="serversList"></ul>
+  <ul id="serversList"></ul>
     </div>
 
     <!-- Chat Section -->
-    <div id="chatSection">
+  <div id="chatSection">
       <h2>💬 Chat Room</h2>
-      <ul id="messages"></ul>
-      <input id="msgInput" placeholder="Type a message..." />
-      <button id="sendBtn">Send</button>
-    </div>
+    <ul id="messages"></ul>
+    <input id="msgInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
 
     <!-- Map Section -->
     <div class="map-section">
       <h2>🗺️ Server Locations</h2>
-      <div id="serverMap"></div>
+  <div id="serverMap"></div>
     </div>
   </div>
 
@@ -391,6 +408,7 @@
       const mainSocket = io("http://127.0.0.1:4000");
       let dynamicSocket = null;
       let map;
+      let lastStartedServer = null;
       
       // Chart instances
       let locksChart = null;
@@ -425,6 +443,7 @@
           const response = await fetch("/upload", {
             method: "POST",
             body: formData,
+            headers: { 'x-server-id': 'main' },
             credentials: "include"
           });
 
@@ -589,6 +608,7 @@
             });
             const data = await res.json();
             alert(data.message);
+            lastStartedServer = { host: data.host, port: data.port, name: data.name };
           } catch (err) {
             console.error("Error starting server:", err);
           }
@@ -596,6 +616,15 @@
           console.error("Location access denied:", err.message);
           alert("Please allow location access to start a server.");
         });
+      });
+      
+      // Stop the started server when leaving the page
+      window.addEventListener('beforeunload', () => {
+        if (lastStartedServer && lastStartedServer.port) {
+          try {
+            navigator.sendBeacon('/stop', JSON.stringify({ port: lastStartedServer.port }));
+          } catch (e) {}
+        }
       });
 
       // Update servers list & map in real-time
@@ -665,9 +694,9 @@
         const data = await res.json();
         const navbar = document.getElementById("profile");
         if (data.authenticated) {
-          navbar.innerHTML = `<span>${data.user.email}</span> <a href="/logout"> Logout</a>`;
+          navbar.innerHTML = `<a href="/profile" class="user-email">${data.user.email}</a> <a href="/logout">Logout</a>`;
         } else {
-          navbar.innerHTML = '<a href="/login">Login</a>';
+          navbar.innerHTML = '<span class="profile-icon">👤</span><a href="/login">Login</a>';
         }
       }
       check();

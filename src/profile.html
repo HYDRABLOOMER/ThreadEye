@@ -1,76 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern User Profile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="profstyle.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThreadEye | Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="profstyle.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header class="navbar">
-        <div class="logo">
-            <a href="#">**AppName**</a>
-        </div>
-        <nav class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Settings</a>
-            <a href="#">Support</a>
-        </nav>
-        <div class="user-action">
-            <div class="logged-in-user">
-                <span class="username-display">**Jane Doe**</span>
-                <img src="user-avatar.jpg" alt="User Avatar" class="nav-avatar">
-            </div>
-        </div>
-    </header>
+  <header class="navbar">
+    <div class="logo">
+      <a href="/userdash">ThreadEye</a>
+    </div>
+    <nav class="nav-links">
+      <a href="/userdash">Dashboard</a>
+      <a href="/profile" class="active">Profile</a>
+      <a href="/admindash">Admin</a>
+    </nav>
+    <div class="user-action" id="navUser">
+      <div class="logged-in-user">
+        <span class="username-display" id="navUsername">Loading...</span>
+        <div class="nav-avatar" id="navAvatar">👤</div>
+      </div>
+    </div>
+  </header>
 
-    <main class="profile-container">
-        <aside class="profile-card">
-            <div class="profile-header">
-                <img src="user-avatar.jpg" alt="Profile Picture" class="profile-pic">
-                <h1>**Jane Doe**</h1>
-                <p class="user-title">Software Developer | UI/UX Enthusiast</p>
-                <button class="edit-profile-btn">Edit Profile</button>
-            </div>
-            <div class="profile-stats">
-                <div class="stat-item">
-                    <span>1.2k</span>
-                    <p>Followers</p>
-                </div>
-                <div class="stat-item">
-                    <span>350</span>
-                    <p>Following</p>
-                </div>
-                <div class="stat-item">
-                    <span>87</span>
-                    <p>Posts</p>
-                </div>
-            </div>
-            <div class="profile-bio">
-                <h2>About Me</h2>
-                <p>Building beautiful and functional web applications. Passionate about clean code and modern design principles. Always learning and exploring new tech!</p>
-            </div>
-        </aside>
+  <main class="profile-container">
+    <aside class="profile-card">
+      <div class="profile-header">
+        <div class="profile-pic" id="profileInitials">TU</div>
+        <h1 id="profileName">ThreadEye User</h1>
+        <p class="user-title" id="profileRole">Role</p>
+        <div class="profile-meta">
+          <span id="profileEmail">user@email.com</span>
+        </div>
+        <button class="edit-profile-btn" id="logoutBtn">Logout</button>
+      </div>
 
-        <section class="profile-content">
-            <h2>Recent Activity</h2>
-            <div class="activity-post">
-                <h3>Launched new feature 'Dark Mode' 🚀</h3>
-                <p class="timestamp">2 hours ago</p>
-                <p>The feedback has been incredible! We're excited to offer a more comfortable viewing experience for everyone.</p>
-            </div>
-            <div class="activity-post">
-                <h3>New Tutorial: CSS Grid Mastery</h3>
-                <p class="timestamp">1 day ago</p>
-                <p>Just published a comprehensive guide on using CSS Grid for complex layouts. Check it out on the blog section.</p>
-            </div>
-            <div class="activity-post">
-                <h3>Completed 'Advanced React' Course</h3>
-                <p class="timestamp">3 days ago</p>
-                <p>Feeling great about solidifying my knowledge in hooks and state management.</p>
-            </div>
-        </section>
-    </main>
+      <div class="profile-stats-grid">
+        <div class="profile-stat">
+          <h3>Total Online Time</h3>
+          <p id="statOnlineTime">0h</p>
+        </div>
+        <div class="profile-stat">
+          <h3>Files Hosted</h3>
+          <p id="statFilesHosted">0</p>
+        </div>
+        <div class="profile-stat">
+          <h3>Files Accessed</h3>
+          <p id="statFilesAccessed">0</p>
+        </div>
+        <div class="profile-stat">
+          <h3>Files Edited</h3>
+          <p id="statFilesEdited">0</p>
+        </div>
+      </div>
+
+      <div class="profile-session">
+        <h2>Recent Sessions</h2>
+        <ul id="sessionList" class="session-list"></ul>
+      </div>
+    </aside>
+
+    <section class="profile-content">
+      <div class="profile-section">
+        <h2>Usage Overview</h2>
+        <div class="metrics-cards">
+          <div class="metric-card">
+            <span class="metric-label">Current Session</span>
+            <span class="metric-value" id="currentSession">00:00:00</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Last Login</span>
+            <span class="metric-value" id="lastLogin">--</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Last Logout</span>
+            <span class="metric-value" id="lastLogout">--</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Total Sessions</span>
+            <span class="metric-value" id="totalSessions">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2>Resource Usage</h2>
+        <div class="resource-layout">
+          <div class="resource-list">
+            <ul id="resourceUsageList"></ul>
+          </div>
+          <div class="resource-chart">
+            <canvas id="resourceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2>Activity Timeline</h2>
+        <canvas id="sessionChart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const navUser = document.getElementById("navUser");
+    const navUsername = document.getElementById("navUsername");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const profileRole = document.getElementById("profileRole");
+    const profileInitials = document.getElementById("profileInitials");
+    const statOnlineTime = document.getElementById("statOnlineTime");
+    const statFilesHosted = document.getElementById("statFilesHosted");
+    const statFilesAccessed = document.getElementById("statFilesAccessed");
+    const statFilesEdited = document.getElementById("statFilesEdited");
+    const sessionList = document.getElementById("sessionList");
+    const currentSessionEl = document.getElementById("currentSession");
+    const lastLoginEl = document.getElementById("lastLogin");
+    const lastLogoutEl = document.getElementById("lastLogout");
+    const totalSessionsEl = document.getElementById("totalSessions");
+    const resourceUsageList = document.getElementById("resourceUsageList");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let currentSessionInterval = null;
+    let sessionChart = null;
+    let resourceChart = null;
+
+    async function fetchProfile() {
+      try {
+        const statusRes = await fetch("/api/auth/status", { credentials: "include" });
+        const statusData = await statusRes.json();
+
+        if (!statusData.authenticated) {
+          window.location.href = "/login";
+          return;
+        }
+
+        navUsername.textContent = statusData.user.email;
+
+        const statsRes = await fetch("/api/auth/user/stats", { credentials: "include" });
+        if (!statsRes.ok) {
+          throw new Error("Failed to fetch stats");
+        }
+        const stats = await statsRes.json();
+        populateProfile(stats);
+      } catch (error) {
+        console.error("Profile load error:", error);
+      }
+    }
+
+    function populateProfile(data) {
+      profileName.textContent = data.username || "ThreadEye User";
+      profileEmail.textContent = data.email;
+      profileRole.textContent = data.role?.toUpperCase();
+      profileInitials.textContent = data.username ? data.username.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "TU";
+
+      const stats = data.statistics || {};
+      statOnlineTime.textContent = formatDuration(stats.totalOnlineTime || 0);
+      statFilesHosted.textContent = stats.filesHosted ?? 0;
+      statFilesAccessed.textContent = stats.filesAccessed ?? 0;
+      statFilesEdited.textContent = stats.filesEdited ?? 0;
+      totalSessionsEl.textContent = stats.totalSessions ?? 0;
+
+      lastLoginEl.textContent = formatDate(stats.lastLogin);
+      lastLogoutEl.textContent = formatDate(stats.lastLogout);
+
+      populateSessions(stats.sessions || []);
+      populateResources(data.resourceUsage || []);
+      startCurrentSessionTimer(stats.sessions || []);
+      renderSessionChart(stats.sessions || []);
+    }
+
+    function populateSessions(sessions) {
+      sessionList.innerHTML = "";
+      if (!sessions.length) {
+        sessionList.innerHTML = '<li class="session-empty">No sessions recorded yet.</li>';
+        return;
+      }
+
+      sessions.slice().reverse().slice(0, 6).forEach((session) => {
+        const li = document.createElement("li");
+        li.className = "session-item";
+        const login = formatDateTime(session.loginTime);
+        const logout = session.logoutTime ? formatDateTime(session.logoutTime) : "Active";
+        const duration = formatDuration(session.duration || 0);
+        li.innerHTML = `
+          <div>
+            <strong>Login:</strong> ${login}<br />
+            <strong>Logout:</strong> ${logout}
+          </div>
+          <span class="session-duration">${duration}</span>
+        `;
+        sessionList.appendChild(li);
+      });
+    }
+
+    function populateResources(resources) {
+      resourceUsageList.innerHTML = "";
+      if (!resources.length) {
+        resourceUsageList.innerHTML = '<li class="resource-empty">No resource usage recorded.</li>';
+      }
+
+      const chartLabels = [];
+      const chartData = [];
+
+      resources.forEach((resource) => {
+        const li = document.createElement("li");
+        li.className = "resource-item";
+        li.innerHTML = `
+          <div class="resource-title">
+            <span class="resource-type">${resource.resourceType.toUpperCase()}</span>
+            <span>${resource.resourceId}</span>
+          </div>
+          <div class="resource-meta">
+            <span>Access Count: ${resource.accessCount}</span>
+            <span>Total Time: ${formatDuration(resource.totalTimeSpent || 0)}</span>
+            <span>Last Accessed: ${formatDateTime(resource.lastAccessed)}</span>
+          </div>
+        `;
+        resourceUsageList.appendChild(li);
+
+        chartLabels.push(resource.resourceId);
+        chartData.push(resource.totalTimeSpent || 0);
+      });
+
+      renderResourceChart(chartLabels.length ? chartLabels : ["No Resources"], chartData.length ? chartData : [1]);
+    }
+
+    function startCurrentSessionTimer(sessions) {
+      if (currentSessionInterval) {
+        clearInterval(currentSessionInterval);
+      }
+
+      const activeSession = sessions.find((s) => !s.logoutTime);
+      if (!activeSession) {
+        currentSessionEl.textContent = "00:00:00";
+        return;
+      }
+
+      const updateTimer = () => {
+        const duration = Math.floor((Date.now() - new Date(activeSession.loginTime)) / 1000);
+        currentSessionEl.textContent = formatDuration(duration);
+      };
+
+      updateTimer();
+      currentSessionInterval = setInterval(updateTimer, 1000);
+    }
+
+    function renderSessionChart(sessions) {
+      if (sessionChart) {
+        sessionChart.destroy();
+      }
+
+      const labels = sessions.map((s, idx) => `Session ${idx + 1}`);
+      const durations = sessions.map((s) => Math.max((s.duration || 0) / 60, 0)); // minutes
+
+      const ctx = document.getElementById("sessionChart").getContext("2d");
+      sessionChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Session Duration (minutes)",
+              data: durations,
+              backgroundColor: "rgba(0, 212, 255, 0.4)",
+              borderColor: "#00d4ff",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: "#f0f0f0" } },
+          },
+          scales: {
+            x: {
+              ticks: { color: "#f0f0f0" },
+              grid: { color: "rgba(255, 255, 255, 0.05)" },
+            },
+            y: {
+              ticks: { color: "#f0f0f0" },
+              grid: { color: "rgba(255, 255, 255, 0.05)" },
+            },
+          },
+        },
+      });
+    }
+
+    function renderResourceChart(labels, data) {
+      if (resourceChart) {
+        resourceChart.destroy();
+      }
+
+      const ctx = document.getElementById("resourceChart").getContext("2d");
+      resourceChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [
+            {
+              data,
+              backgroundColor: [
+                "#00d4ff",
+                "#4caf50",
+                "#ff9800",
+                "#ff6b6b",
+                "#9c27b0",
+                "#3f51b5",
+              ],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom", labels: { color: "#f0f0f0" } },
+          },
+        },
+      });
+    }
+
+    function formatDuration(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "--";
+      const date = new Date(dateStr);
+      return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return "--";
+      const date = new Date(dateStr);
+      return date.toLocaleString();
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+        window.location.href = "/login";
+      } catch (error) {
+        console.error("Logout failed", error);
+      }
+    });
+
+    fetchProfile();
+  </script>
 </body>
 </html>

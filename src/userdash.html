@@ -32,18 +32,50 @@
       font-size: 1.5rem;
       font-weight: 600;
       color: #00d4ff;
+      text-decoration: none;
+    }
+    .navbar .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar .nav-links a {
+      color: #f0f0f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .navbar .nav-links a:hover {
+      color: #00d4ff;
+      background-color: rgba(0, 212, 255, 0.1);
     }
     .navbar .profile {
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .navbar a {
+    .navbar .profile a {
       color: #f0f0f0;
       text-decoration: none;
       margin-left: 15px;
       transition: color 0.3s;
     }
-    .navbar a:hover {
+    .navbar .profile a:hover {
       color: #00d4ff;
+    }
+    .navbar .profile .user-email {
+      color: #00d4ff;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    .navbar .profile .user-email:hover {
+      background-color: rgba(0, 212, 255, 0.1);
     }
 
     /* Layout */
@@ -372,6 +404,10 @@
 <body>
   <nav class="navbar">
     <div class="logo">ThreadEye</div>
+    <div class="nav-links">
+      <a href="/userdash">Dashboard</a>
+      <a href="/profile">Profile</a>
+    </div>
     <div class="profile" id="profile"><a href="/login">Login</a></div>
   </nav>
 
@@ -441,6 +477,8 @@
     let currentFile = null;
     let isFileLocked = false;
     let currentUser = null;
+    let currentServerId = "main";
+    let currentServer = null; // { host, port, name }
 
     // --- AUTH CHECK ---
     async function checkAuth() {
@@ -449,7 +487,7 @@
       const navbar = document.getElementById("profile");
       if (data.authenticated) {
         currentUser = data.user.email;
-        navbar.innerHTML = `<span>${data.user.email}</span> <a href="/logout">Logout</a>`;
+        navbar.innerHTML = `<a href="/profile" class="user-email">${data.user.email}</a> <a href="/logout">Logout</a>`;
       } else {
         currentUser = 'anonymous';
         navbar.innerHTML = `<a href="/login">Login</a>`;
@@ -487,7 +525,10 @@
     // --- FILE OPERATIONS ---
     async function loadFiles() {
       try {
-        const response = await fetch('/files', { credentials: 'include' });
+        const response = await fetch('/files?serverId=' + encodeURIComponent(currentServerId), { 
+          credentials: 'include',
+          headers: { 'x-server-id': currentServerId }
+        });
         const files = await response.json();
         
         filesList.innerHTML = '';
@@ -525,7 +566,10 @@
 
     async function openTextFile(file) {
       try {
-        const response = await fetch(`/files/text/${file.id}`, { credentials: 'include' });
+        const response = await fetch(`/files/text/${file.id}?serverId=${encodeURIComponent(currentServerId)}`, { 
+          credentials: 'include',
+          headers: { 'x-server-id': currentServerId }
+        });
         const fileData = await response.json();
         
         currentFile = fileData;
@@ -545,7 +589,10 @@
 
     async function downloadFile(filename) {
       try {
-        const response = await fetch(`/files/download/${filename}`, { credentials: 'include' });
+        const response = await fetch(`/files/download/${encodeURIComponent(filename)}?serverId=${encodeURIComponent(currentServerId)}`, { 
+          credentials: 'include',
+          headers: { 'x-server-id': currentServerId }
+        });
         const blob = await response.blob();
         
         const url = window.URL.createObjectURL(blob);
@@ -573,7 +620,8 @@
           body: JSON.stringify({ 
             user: currentUser, 
             filename: currentFile.filename,
-            socketId: mainSocket.id 
+            socketId: mainSocket.id,
+            serverId: currentServerId
           }),
           credentials: 'include'
         });
@@ -588,7 +636,9 @@
           mainSocket.emit('joinFileEdit', {
             fileId: currentFile.id,
             filename: currentFile.filename,
-            user: currentUser
+            user: currentUser,
+            serverId: currentServerId,
+            lockType: 'read'
           });
           
           showEditorStatus('File locked for editing', 'success');
@@ -610,12 +660,18 @@
         const response = await fetch(`/files/text/${currentFile.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content, user: currentUser }),
+          body: JSON.stringify({ content, user: currentUser, serverId: currentServerId }),
           credentials: 'include'
         });
         
         if (response.ok) {
           showEditorStatus('File saved successfully', 'success');
+          // Broadcast change to other readers
+          mainSocket.emit('fileContentChange', {
+            fileId: currentFile.id,
+            content,
+            user: currentUser
+          });
         } else {
           showEditorStatus('Error saving file', 'error');
         }
@@ -643,7 +699,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             user: currentUser,
-            socketId: mainSocket.id 
+            socketId: mainSocket.id,
+            serverId: currentServerId
           }),
           credentials: 'include'
         });
@@ -711,17 +768,29 @@
         serversList.innerHTML = "<li>No servers online yet.</li>";
       } else {
         servers.forEach(({ host, port, name, location }) => {
+          const serverId = name || `Server-${port}`;
           const item = document.createElement("li");
           item.className = "server-item";
           item.innerHTML = `<h3>${name || "Server"}</h3><p>${host}:${port}</p>`;
-          item.onclick = () => connectToServer(host, port);
+          item.onclick = () => {
+            connectToServer(host, port);
+            currentServerId = serverId;
+            currentServer = { host, port, name: serverId };
+            // Refresh files for this server
+            loadFiles();
+          };
           serversList.appendChild(item);
 
           if (location && location.lat && location.lng) {
             const marker = L.marker([location.lat, location.lng])
               .addTo(map)
               .bindPopup(`<b>${name || "Server"}</b><br>Click to connect`)
-              .on("click", () => connectToServer(host, port));
+              .on("click", () => {
+                connectToServer(host, port);
+                currentServerId = serverId;
+                currentServer = { host, port, name: serverId };
+                loadFiles();
+              });
             markers[`${host}:${port}`] = marker;
           }
         });
@@ -763,6 +832,17 @@
         msgInput.value = "";
       };
     }
+
+    // Ensure locks are released on page unload
+    window.addEventListener('beforeunload', () => {
+      if (currentFile && isFileLocked) {
+        navigator.sendBeacon('/files/unlock/' + encodeURIComponent(currentFile.id), JSON.stringify({
+          user: currentUser,
+          socketId: mainSocket.id,
+          serverId: currentServerId
+        }));
+      }
+    });
   </script>
 </body>
 </html>

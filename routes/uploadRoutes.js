@@ -4,6 +4,7 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const { GridFSBucket } = require("mongodb");
 const { File, Log } = require("../model/log");
+const serverRegistry = require("../serverRegistry");
 
 const conn = mongoose.connection;
 let gfsBucket;
@@ -28,6 +29,11 @@ router.post("/", upload.single("file"), async (req, res) => {
   if (!req.file) return res.status(400).send("No file uploaded");
 
   try {
+    const serverId = req.body.serverId || req.headers["x-server-id"] || "main";
+    if (!serverRegistry.isRunning(serverId)) {
+      return res.status(409).json({ message: "Target server is offline", serverId });
+    }
+    const uploadedBy = req.user?.email || "admin";
     const isText = isTextFile(req.file.originalname, req.file.mimetype);
     
     if (isText) {
@@ -37,7 +43,8 @@ router.post("/", upload.single("file"), async (req, res) => {
         originalName: req.file.originalname,
         contentType: req.file.mimetype,
         size: req.file.size,
-        uploadedBy: req.user?.email || 'admin',
+        uploadedBy,
+        uploadedServerId: serverId,
         isTextFile: true,
         content: req.file.buffer.toString('utf8')
       });
@@ -47,7 +54,7 @@ router.post("/", upload.single("file"), async (req, res) => {
       // Log the upload
       const log = new Log({
         filename: req.file.originalname,
-        user: req.user?.email || 'admin',
+        user: uploadedBy,
         operation: 'upload',
         timestamp: new Date(),
         status: 'success'
@@ -64,7 +71,8 @@ router.post("/", upload.single("file"), async (req, res) => {
       // Store binary files in GridFS
       const uploadStream = gfsBucket.openUploadStream(req.file.originalname, {
         metadata: {
-          uploadedBy: req.user?.email || 'admin',
+          uploadedBy,
+          uploadedServerId: serverId,
           contentType: req.file.mimetype
         }
       });
@@ -78,7 +86,8 @@ router.post("/", upload.single("file"), async (req, res) => {
           originalName: req.file.originalname,
           contentType: req.file.mimetype,
           size: req.file.size,
-          uploadedBy: req.user?.email || 'admin',
+          uploadedBy,
+          uploadedServerId: serverId,
           isTextFile: false
         });
         
@@ -87,7 +96,7 @@ router.post("/", upload.single("file"), async (req, res) => {
         // Log the upload
         const log = new Log({
           filename: req.file.originalname,
-          user: req.user?.email || 'admin',
+          user: uploadedBy,
           operation: 'upload',
           timestamp: new Date(),
           status: 'success'
