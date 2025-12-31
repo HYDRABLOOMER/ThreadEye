@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoQuest - Environmental Action Platform</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2E8B57, #228B22, #32CD32);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .redirect-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            color: #2E8B57;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .welcome-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #2E8B57;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .redirect-message {
+            color: #666;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+        
+        .eco-icon {
+            font-size: 2rem;
+            margin: 0 10px;
+        }
+    </style>
+  <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fecoquest4652back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.12"></script>
+  <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2"></script>
+  </head>
+<body>
+    <div class="redirect-container">
+        <div class="logo">🌱 EcoQuest</div>
+        <div class="welcome-text">
+            Welcome to EcoQuest - Your Environmental Action Platform!
+            <br>
+            <span class="eco-icon">🌍</span>
+            <span class="eco-icon">♻️</span>
+            <span class="eco-icon">🌿</span>
+        </div>
+        <div class="loading-spinner"></div>
+        <div class="redirect-message">
+            Redirecting to your dashboard...
+        </div>
+    </div>
+
+    <script>
+        // Show loading for 2 seconds then redirect to user dashboard
+        setTimeout(function() {
+            window.location.href = 'pages/user_dashboard.html';
+        }, 2000);
+        
+        // Fallback redirect in case of any issues
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/')) {
+                    window.location.href = 'pages/user_dashboard.html';
+                }
+            }, 3000);
+        });
+    </script>
+<script id="dhws-dataInjector" src="/public/dhws-data-injector.js"></script>
+</body>
+</html>

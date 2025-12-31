@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - EcoQuest</title>
+    <link rel="stylesheet" href="../css/main.css">
+  <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fecoquest4652back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.12"></script>
+  <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2"></script>
+  </head>
+<body class="bg-background">
+    <!-- Navigation Header -->
+    <header class="bg-surface border-b border-border-surface sticky top-0 z-100">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <svg class="w-10 h-10" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" fill="#2D7D32"/>
+                        <path d="M20 8C18.5 8 17 9 17 11C17 13 18.5 14 20 14C21.5 14 23 13 23 11C23 9 21.5 8 20 8Z" fill="#4CAF50"/>
+                        <path d="M20 14C18 14 16 15.5 16 18V24C16 26.5 18 28 20 28C22 28 24 26.5 24 24V18C24 15.5 22 14 20 14Z" fill="#66BB6A"/>
+                        <ellipse cx="20" cy="30" rx="8" ry="2" fill="#1B5E20"/>
+                    </svg>
+                    <span class="text-2xl font-heading font-bold text-primary">EcoQuest</span>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="user_dashboard.html" class="px-4 py-2 rounded-lg bg-primary-50 text-primary font-medium">Dashboard</a>
+                    <a href="knowledge_quiz.html" class="px-4 py-2 rounded-lg text-text-secondary hover:bg-surface-50 transition-colors">Quiz</a>
+                    <a href="eco_tasks.html" class="px-4 py-2 rounded-lg text-text-secondary hover:bg-surface-50 transition-colors">Tasks</a>
+                    <a href="community_issues.html" class="px-4 py-2 rounded-lg text-text-secondary hover:bg-surface-50 transition-colors">Community</a>
+                    <a href="leaderboards.html" class="px-4 py-2 rounded-lg text-text-secondary hover:bg-surface-50 transition-colors">Leaderboards</a>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-4">
+                    <button class="relative p-2 text-text-secondary hover:text-primary transition-colors">
+                        <img src="https://img.rocket.new/generatedImages/rocket_gen_img_16a438811-1766990283880.png" alt="Notifications icon" class="w-6 h-6">
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
+                    </button>
+                    <a href="user_profile.html" class="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                        <img src="https://img.rocket.new/generatedImages/rocket_gen_img_16e7b66b9-1766496824802.png" alt="User profile avatar" class="w-9 h-9 rounded-full object-cover border-2 border-primary">
+                        <span class="hidden sm:block text-sm font-medium text-text-primary">Alex Rivera</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-heading font-bold text-text-primary mb-2">Welcome back, Alex! 🌱</h1>
+            <p class="text-text-secondary">Track your environmental impact and continue your sustainability journey</p>
+        </div>
+
+        <!-- Metrics Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- EcoPoints Card -->
+            <div class="card card-hover bg-gradient-to-br from-primary-50 to-primary-100 border-primary/20">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-text-secondary font-medium mb-1">Total EcoPoints</p>
+                        <h3 class="text-3xl font-heading font-bold text-primary">2,847</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                        <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1c051c6eb-1767175398367.png" alt="Leaf icon representing EcoPoints" class="w-7 h-7">
+                    </div>
+                </div>
+                <div class="flex items-center text-sm text-success-700">
+                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_17ff887b6-1766938191415.png" alt="Trending up icon" class="w-4 h-4 mr-1">
+                    <span>+156 this week</span>
+                </div>
+            </div>
+
+            <!-- Daily Streak Card -->
+            <div class="card card-hover bg-gradient-to-br from-accent-50 to-accent-100 border-accent/20">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-text-secondary font-medium mb-1">Daily Streak</p>
+                        <h3 class="text-3xl font-heading font-bold text-accent">23 Days</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center">
+                        <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1629195c5-1766515855391.png" alt="Fire icon representing streak" class="w-7 h-7">
+                    </div>
+                </div>
+                <div class="flex items-center text-sm text-accent-700">
+                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_10d875ff2-1766817002058.png" alt="Calendar check icon" class="w-4 h-4 mr-1">
+                    <span>Keep it going!</span>
+                </div>
+            </div>
+
+            <!-- Weekly Rank Card -->
+            <div class="card card-hover bg-gradient-to-br from-secondary-50 to-secondary-100 border-secondary/20">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-text-secondary font-medium mb-1">Weekly Rank</p>
+                        <h3 class="text-3xl font-heading font-bold text-secondary">#47</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center">
+                        <img src="https://img.rocket.new/generatedImages/rocket_gen_img_14593a0c3-1766478849962.png" alt="Trophy icon representing rank" class="w-7 h-7">
+                    </div>
+                </div>
+                <div class="flex items-center text-sm text-success-700">
+                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1f422c906-1764693352407.png" alt="Arrow up icon" class="w-4 h-4 mr-1">
+                    <span>Up 12 positions</span>
+                </div>
+            </div>
+
+            <!-- Achievements Card -->
+            <div class="card card-hover bg-gradient-to-br from-success-50 to-success-100 border-success/20">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-text-secondary font-medium mb-1">Achievements</p>
+                        <h3 class="text-3xl font-heading font-bold text-success">18/32</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-success rounded-xl flex items-center justify-center">
+                        <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1d7bf836c-1766377941249.png" alt="Medal icon representing achievements" class="w-7 h-7">
+                    </div>
+                </div>
+                <div class="flex items-center text-sm text-success-700">
+                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1b91d987a-1766948255607.png" alt="Star icon" class="w-4 h-4 mr-1">
+                    <span>2 new unlocked</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Activity Feed Section -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Quick Actions -->
+                <div class="card">
+                    <h2 class="text-2xl font-heading font-semibold text-text-primary mb-6">Quick Actions</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <a href="knowledge_quiz.html" class="flex flex-col items-center p-6 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors group">
+                            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_19077bca4-1767175396714.png" alt="Brain icon for quiz" class="w-8 h-8">
+                            </div>
+                            <h3 class="font-heading font-semibold text-text-primary mb-1">Daily Quiz</h3>
+                            <p class="text-sm text-text-secondary text-center">Test your knowledge</p>
+                        </a>
+
+                        <a href="eco_tasks.html" class="flex flex-col items-center p-6 bg-accent-50 rounded-xl hover:bg-accent-100 transition-colors group">
+                            <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_191c9319b-1766266413730.png" alt="Clipboard icon for tasks" class="w-8 h-8">
+                            </div>
+                            <h3 class="font-heading font-semibold text-text-primary mb-1">Eco Tasks</h3>
+                            <p class="text-sm text-text-secondary text-center">Complete challenges</p>
+                        </a>
+
+                        <a href="community_issues.html" class="flex flex-col items-center p-6 bg-secondary-50 rounded-xl hover:bg-secondary-100 transition-colors group">
+                            <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1d0a994d0-1767094688711.png" alt="Group icon for community" class="w-8 h-8">
+                            </div>
+                            <h3 class="font-heading font-semibold text-text-primary mb-1">Community</h3>
+                            <p class="text-sm text-text-secondary text-center">Join discussions</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Feed -->
+                <div class="card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-heading font-semibold text-text-primary">Recent Activity</h2>
+                        <button class="text-sm text-primary hover:text-primary-600 font-medium">View All</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Activity Item 1 -->
+                        <div class="flex items-start space-x-4 p-4 bg-surface-50 rounded-xl hover:bg-surface-100 transition-colors">
+                            <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_12c15170c-1766722959657.png" alt="Check circle icon" class="w-6 h-6">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary mb-1">Quiz Completed: Climate Change Basics</h4>
+                                <p class="text-sm text-text-secondary mb-2">Scored 85% and earned 50 EcoPoints</p>
+                                <div class="flex items-center text-xs text-text-tertiary">
+                                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_175bcfdbd-1764676194744.png" alt="Clock icon" class="w-4 h-4 mr-1">
+                                    <span>2 hours ago</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-success">+50 pts</span>
+                        </div>
+
+                        <!-- Activity Item 2 -->
+                        <div class="flex items-start space-x-4 p-4 bg-surface-50 rounded-xl hover:bg-surface-100 transition-colors">
+                            <div class="w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_16f0a5ddb-1766914706043.png" alt="Camera icon" class="w-6 h-6">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary mb-1">Task Submitted: Beach Cleanup</h4>
+                                <p class="text-sm text-text-secondary mb-2">Photo verification pending approval</p>
+                                <div class="flex items-center text-xs text-text-tertiary">
+                                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_175bcfdbd-1764676194744.png" alt="Clock icon" class="w-4 h-4 mr-1">
+                                    <span>5 hours ago</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-warning">Pending</span>
+                        </div>
+
+                        <!-- Activity Item 3 -->
+                        <div class="flex items-start space-x-4 p-4 bg-surface-50 rounded-xl hover:bg-surface-100 transition-colors">
+                            <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_106aa7e9e-1766941691068.png" alt="Comment icon" class="w-6 h-6">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary mb-1">Community Post: Local Recycling Initiative</h4>
+                                <p class="text-sm text-text-secondary mb-2">Your post received 23 likes and 8 comments</p>
+                                <div class="flex items-center text-xs text-text-tertiary">
+                                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_175bcfdbd-1764676194744.png" alt="Clock icon" class="w-4 h-4 mr-1">
+                                    <span>Yesterday</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-primary">+15 pts</span>
+                        </div>
+
+                        <!-- Activity Item 4 -->
+                        <div class="flex items-start space-x-4 p-4 bg-surface-50 rounded-xl hover:bg-surface-100 transition-colors">
+                            <div class="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1dc390faf-1764656751378.png" alt="Trophy variant icon" class="w-6 h-6">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary mb-1">Achievement Unlocked: Week Warrior</h4>
+                                <p class="text-sm text-text-secondary mb-2">Completed 7 consecutive daily tasks</p>
+                                <div class="flex items-center text-xs text-text-tertiary">
+                                    <img src="https://img.rocket.new/generatedImages/rocket_gen_img_175bcfdbd-1764676194744.png" alt="Clock icon" class="w-4 h-4 mr-1">
+                                    <span>2 days ago</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-success">+100 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Impact Visualization -->
+                <div class="card">
+                    <h2 class="text-2xl font-heading font-semibold text-text-primary mb-6">Monthly Impact</h2>
+                    
+                    <!-- Impact Stats -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center p-4 bg-primary-50 rounded-xl">
+                            <div class="text-3xl font-heading font-bold text-primary mb-1">12</div>
+                            <div class="text-sm text-text-secondary">Quizzes</div>
+                        </div>
+                        <div class="text-center p-4 bg-accent-50 rounded-xl">
+                            <div class="text-3xl font-heading font-bold text-accent mb-1">8</div>
+                            <div class="text-sm text-text-secondary">Tasks</div>
+                        </div>
+                        <div class="text-center p-4 bg-secondary-50 rounded-xl">
+                            <div class="text-3xl font-heading font-bold text-secondary mb-1">15</div>
+                            <div class="text-sm text-text-secondary">Posts</div>
+                        </div>
+                        <div class="text-center p-4 bg-success-50 rounded-xl">
+                            <div class="text-3xl font-heading font-bold text-success mb-1">3</div>
+                            <div class="text-sm text-text-secondary">Badges</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Chart Placeholder -->
+                    <div class="bg-surface-50 rounded-xl p-6 h-64 flex items-center justify-center" role="img" aria-label="Monthly activity progress chart showing consistent engagement throughout December 2025">
+                        <svg viewBox="0 0 600 200" class="w-full h-full">
+                            <!-- Grid Lines -->
+                            <line x1="50" y1="20" x2="50" y2="180" stroke="#E0E0E0" stroke-width="1"/>
+                            <line x1="50" y1="180" x2="580" y2="180" stroke="#E0E0E0" stroke-width="2"/>
+                            
+                            <!-- Bar Chart -->
+                            <rect x="80" y="120" width="30" height="60" fill="#4CAF50" rx="4"/>
+                            <rect x="130" y="100" width="30" height="80" fill="#4CAF50" rx="4"/>
+                            <rect x="180" y="90" width="30" height="90" fill="#4CAF50" rx="4"/>
+                            <rect x="230" y="110" width="30" height="70" fill="#4CAF50" rx="4"/>
+                            <rect x="280" y="80" width="30" height="100" fill="#2D7D32" rx="4"/>
+                            <rect x="330" y="70" width="30" height="110" fill="#2D7D32" rx="4"/>
+                            <rect x="380" y="60" width="30" height="120" fill="#2D7D32" rx="4"/>
+                            <rect x="430" y="50" width="30" height="130" fill="#FF9800" rx="4"/>
+                            
+                            <!-- Labels -->
+                            <text x="95" y="195" font-size="12" fill="#666666" text-anchor="middle">W1</text>
+                            <text x="145" y="195" font-size="12" fill="#666666" text-anchor="middle">W2</text>
+                            <text x="195" y="195" font-size="12" fill="#666666" text-anchor="middle">W3</text>
+                            <text x="245" y="195" font-size="12" fill="#666666" text-anchor="middle">W4</text>
+                            <text x="295" y="195" font-size="12" fill="#666666" text-anchor="middle">W5</text>
+                            <text x="345" y="195" font-size="12" fill="#666666" text-anchor="middle">W6</text>
+                            <text x="395" y="195" font-size="12" fill="#666666" text-anchor="middle">W7</text>
+                            <text x="445" y="195" font-size="12" fill="#666666" text-anchor="middle">W8</text>
+                            
+                            <text x="300" y="15" font-size="14" fill="#1A1A1A" text-anchor="middle" font-weight="600">December 2025 Activity</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="space-y-6">
+                <!-- Live Leaderboard -->
+                <div class="card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-heading font-semibold text-text-primary">Leaderboard</h2>
+                        <a href="leaderboards.html" class="text-sm text-primary hover:text-primary-600 font-medium">View All</a>
+                    </div>
+
+                    <!-- Leaderboard Tabs -->
+                    <div class="flex space-x-2 mb-6 bg-surface-50 p-1 rounded-lg">
+                        <button class="flex-1 px-3 py-2 text-sm font-medium rounded-md bg-primary text-white transition-colors">Weekly</button>
+                        <button class="flex-1 px-3 py-2 text-sm font-medium rounded-md text-text-secondary hover:bg-surface-100 transition-colors">Global</button>
+                        <button class="flex-1 px-3 py-2 text-sm font-medium rounded-md text-text-secondary hover:bg-surface-100 transition-colors">Clan</button>
+                    </div>
+
+                    <!-- Leaderboard List -->
+                    <div class="space-y-3">
+                        <!-- Rank 1 -->
+                        <div class="flex items-center space-x-3 p-3 bg-gradient-to-r from-accent-50 to-transparent rounded-lg">
+                            <div class="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_10458bf2c-1763293523905.png" alt="Profile picture of Sarah Chen" class="w-10 h-10 rounded-full object-cover border-2 border-accent">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary truncate">Sarah Chen</h4>
+                                <p class="text-xs text-text-secondary">3,542 pts</p>
+                            </div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1f6e0834a-1764648931634.png" alt="Trending up indicator" class="w-5 h-5">
+                        </div>
+
+                        <!-- Rank 2 -->
+                        <div class="flex items-center space-x-3 p-3 bg-gradient-to-r from-primary-50 to-transparent rounded-lg">
+                            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_184e5f4b2-1763294080263.png" alt="Profile picture of Marcus Johnson" class="w-10 h-10 rounded-full object-cover border-2 border-primary">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary truncate">Marcus Johnson</h4>
+                                <p class="text-xs text-text-secondary">3,401 pts</p>
+                            </div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1f6e0834a-1764648931634.png" alt="Trending up indicator" class="w-5 h-5">
+                        </div>
+
+                        <!-- Rank 3 -->
+                        <div class="flex items-center space-x-3 p-3 bg-gradient-to-r from-secondary-50 to-transparent rounded-lg">
+                            <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1a5df2297-1763292384104.png" alt="Profile picture of Emma Wilson" class="w-10 h-10 rounded-full object-cover border-2 border-secondary">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary truncate">Emma Wilson</h4>
+                                <p class="text-xs text-text-secondary">3,298 pts</p>
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1629902689707-b578af415187" alt="No change indicator" class="w-5 h-5">
+                        </div>
+
+                        <!-- Current User -->
+                        <div class="flex items-center space-x-3 p-3 bg-gradient-to-r from-success-50 to-transparent rounded-lg border-2 border-success">
+                            <div class="w-8 h-8 bg-success rounded-full flex items-center justify-center text-white font-bold text-sm">47</div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1c2c3237e-1766481832967.png" alt="Your profile picture" class="w-10 h-10 rounded-full object-cover border-2 border-success">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-text-primary truncate">You (Alex Rivera)</h4>
+                                <p class="text-xs text-text-secondary">2,847 pts</p>
+                            </div>
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1f6e0834a-1764648931634.png" alt="Trending up indicator" class="w-5 h-5">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Streak Calendar -->
+                <div class="card">
+                    <h2 class="text-xl font-heading font-semibold text-text-primary mb-6">Streak Calendar</h2>
+                    
+                    <!-- Calendar Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-medium text-text-primary">December 2025</h3>
+                        <div class="flex items-center space-x-2">
+                            <button class="p-1 hover:bg-surface-50 rounded transition-colors">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_168e0d532-1765294219313.png" alt="Previous month" class="w-5 h-5">
+                            </button>
+                            <button class="p-1 hover:bg-surface-50 rounded transition-colors">
+                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_168e0d532-1765294219313.png" alt="Next month" class="w-5 h-5">
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div class="grid grid-cols-7 gap-2">
+                        <!-- Day Labels -->
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">S</div>
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">M</div>
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">T</div>
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">W</div>
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">T</div>
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">F</div>
+                        <div class="text-center text-xs font-medium text-text-tertiary py-2">S</div>
+
+                        <!-- Calendar Days -->
+                        <div class="aspect-square"></div>
+                        <div class="aspect-square"></div>
+                        <div class="aspect-square"></div>
+                        <div class="aspect-square"></div>
+                        <div class="aspect-square"></div>
+                        <div class="aspect-square"></div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">1</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">2</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">3</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">4</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">5</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">6</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">7</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">8</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">9</div>
+                        <div class="aspect-square bg-surface-100 rounded-lg flex items-center justify-center text-xs font-medium text-text-tertiary">10</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">11</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">12</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">13</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">14</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">15</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">16</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">17</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">18</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">19</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">20</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">21</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">22</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">23</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">24</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">25</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">26</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">27</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">28</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">29</div>
+                        <div class="aspect-square bg-success-100 rounded-lg flex items-center justify-center text-xs font-medium text-success-700">30</div>
+                        <div class="aspect-square bg-primary rounded-lg flex items-center justify-center text-xs font-bold text-white border-2 border-accent">31</div>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-success-100 rounded"></div>
+                            <span class="text-text-secondary">Active</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-surface-100 rounded"></div>
+                            <span class="text-text-secondary">Missed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Notifications -->
+                <div class="card">
+                    <h2 class="text-xl font-heading font-semibold text-text-primary mb-6">Notifications</h2>
+                    
+                    <div class="space-y-3">
+                        <!-- Notification 1 -->
+                        <div class="flex items-start space-x-3 p-3 bg-accent-50 rounded-lg border-l-4 border-accent">
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_185b9a52d-1766963843797.png" alt="Clock alert icon" class="w-5 h-5 mt-0.5 flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-text-primary mb-1">Task Verification Pending</h4>
+                                <p class="text-xs text-text-secondary">Your beach cleanup task is awaiting approval</p>
+                            </div>
+                        </div>
+
+                        <!-- Notification 2 -->
+                        <div class="flex items-start space-x-3 p-3 bg-primary-50 rounded-lg border-l-4 border-primary">
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_104244020-1767175407184.png" alt="Trophy icon" class="w-5 h-5 mt-0.5 flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-text-primary mb-1">Live Quiz Starting Soon</h4>
+                                <p class="text-xs text-text-secondary">Join "Ocean Conservation" quiz in 15 minutes</p>
+                            </div>
+                        </div>
+
+                        <!-- Notification 3 -->
+                        <div class="flex items-start space-x-3 p-3 bg-secondary-50 rounded-lg border-l-4 border-secondary">
+                            <img src="https://img.rocket.new/generatedImages/rocket_gen_img_12e6d3686-1767085671019.png" alt="Multiple comments icon" class="w-5 h-5 mt-0.5 flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-text-primary mb-1">New Comments</h4>
+                                <p class="text-xs text-text-secondary">5 new replies on your recycling initiative post</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border-surface z-100">
+        <div class="flex items-center justify-around h-16">
+            <a href="user_dashboard.html" class="flex flex-col items-center space-y-1 text-primary">
+                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_12cc8521d-1765415999525.png" alt="Dashboard icon" class="w-6 h-6">
+                <span class="text-xs font-medium">Dashboard</span>
+            </a>
+            <a href="knowledge_quiz.html" class="flex flex-col items-center space-y-1 text-text-secondary">
+                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1a4458d10-1767056475817.png" alt="Quiz icon" class="w-6 h-6">
+                <span class="text-xs font-medium">Quiz</span>
+            </a>
+            <a href="eco_tasks.html" class="flex flex-col items-center space-y-1 text-text-secondary">
+                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1355b164c-1765190595135.png" alt="Tasks icon" class="w-6 h-6">
+                <span class="text-xs font-medium">Tasks</span>
+            </a>
+            <a href="community_issues.html" class="flex flex-col items-center space-y-1 text-text-secondary">
+                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_132483cf3-1765534793443.png" alt="Community icon" class="w-6 h-6">
+                <span class="text-xs font-medium">Community</span>
+            </a>
+            <a href="user_profile.html" class="flex flex-col items-center space-y-1 text-text-secondary">
+                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_193b9be6e-1766708060514.png" alt="Profile icon" class="w-6 h-6">
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Footer Spacer for Mobile Nav -->
+    <div class="h-16 md:hidden"></div>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>
